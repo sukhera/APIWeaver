@@ -88,21 +88,22 @@ jobs:
       with:
         go-version: '1.24.6'
 
+    - name: Download Go modules
+      run: go mod download
+
     - name: Install and run Gosec
       run: |
-        # Install gosec using go install for better reliability
-        go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
-        # Run gosec with proper configuration
-        gosec -fmt=json -out=gosec-report.json ./internal/... ./pkg/... ./cmd/... || true
-        # Also run with text output for logs
-        gosec ./internal/... ./pkg/... ./cmd/...
-
-    - name: Upload Gosec report
-      uses: actions/upload-artifact@v4
+        # Install gosec using the correct import path
+        go install github.com/securego/gosec/v2/cmd/gosec@latest
+        # Run gosec with SARIF output for GitHub Security tab
+        gosec -fmt sarif -out gosec-results.sarif ./...
+        
+    - name: Upload Gosec scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
       if: always()
       with:
-        name: gosec-security-report
-        path: gosec-report.json
+        sarif_file: gosec-results.sarif
+        category: gosec
 
   semgrep-scan:
     name: Semgrep Security Scan
@@ -298,7 +299,7 @@ jobs:
   security-report:
     name: Security Report
     runs-on: ubuntu-latest
-    needs: [dependency-scan, codeql-analysis, semgrep-scan, secret-scan, license-scan]
+    needs: [dependency-scan, codeql-analysis, gosec-scan, semgrep-scan, secret-scan, license-scan]
     if: always()
     
     steps:
@@ -321,7 +322,11 @@ jobs:
           echo "❌ CodeQL analysis: FAILED" >> security-report.md
         fi
         
-        # Gosec scan removed due to authentication issues
+        if [ "${{ needs.gosec-scan.result }}" = "success" ]; then
+          echo "✅ Gosec scan: PASSED" >> security-report.md
+        else
+          echo "❌ Gosec scan: FAILED" >> security-report.md
+        fi
         
         if [ "${{ needs.semgrep-scan.result }}" = "success" ]; then
           echo "✅ Semgrep scan: PASSED" >> security-report.md
