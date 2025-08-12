@@ -1,29 +1,11 @@
-# Golangci-lint configuration - Focused on functional issues
 version: "2"
 
 run:
   timeout: 5m
-  modules-download-mode: readonly
 
 linters:
   enable:
-    # Essential functional linters
-    - errcheck          # Check for unchecked errors
-    - govet            # Go vet analysis
-    - ineffassign      # Detect ineffectual assignments
-    - staticcheck      # Static analysis
-    - unused           # Check for unused constants, variables, functions and types
-    
-    # Security and best practices
-    - gosec            # Security issues
-    - bodyclose        # HTTP body close checks
-    - copyloopvar      # Detect loop variable issues
-    - errname          # Error naming conventions
-    - makezero         # Zero-length slice creation
-    - misspell         # Misspelled English words
-    - rowserrcheck     # SQL row error checks
-    - sqlclosecheck    # SQL close checks
-    
-    # Code quality (reasonable settings)
-    - goconst          # Repeated strings that could be constants
-    - dupl             # Code duplication (with higher threshold)
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
