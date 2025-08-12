@@ -2,8 +2,6 @@ name: Security
 
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
     branches: [ main ]
   schedule:
     # Run security scans daily at 2 AM UTC
