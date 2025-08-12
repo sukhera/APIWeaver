@@ -2,7 +2,7 @@
 # https://github.com/actions/labeler
 
 # Backend changes
-"backend":
+backend:
   - "**/*.go"
   - "go.mod"
   - "go.sum"
@@ -10,57 +10,57 @@
   - "internal/**/*"
 
 # Frontend changes  
-"frontend":
+frontend:
   - "frontend/**/*"
 
 # Parser changes
-"parser":
+parser:
   - "internal/domain/parser/**/*"
 
 # API changes
-"api":
+api:
   - "internal/api/**/*"
   - "internal/services/**/*"
 
 # Documentation changes
-"documentation":
+documentation:
   - "**/*.md"
   - "docs/**/*"
 
 # Configuration changes
-"config":
+config:
   - "**/*.yml"
   - "**/*.yaml"
   - "**/*.json"
   - ".github/**/*"
 
 # Docker changes
-"docker":
+docker:
   - "Dockerfile*"
   - "docker-compose*.yml"
   - ".dockerignore"
 
 # CI/CD changes
-"ci":
+ci:
   - ".github/workflows/**/*"
 
 # Dependencies
-"dependencies":
+dependencies:
   - "go.mod"
   - "go.sum"
   - "frontend/package*.json"
 
 # Tests
-"tests":
+tests:
   - "**/*_test.go"
   - "**/*.test.*"
   - "test/**/*"
 
 # Security
-"security":
+security:
   - ".github/workflows/security.yml"
   - "SECURITY.md"
 
 # Breaking changes (manual label)
-"breaking-change":
+breaking-change:
   - ""
