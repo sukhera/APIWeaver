@@ -93,7 +93,7 @@ generate-mocks: ## Generate mocks using Mockery
 	@echo "$(BLUE)Generating mocks...$(NC)"
 	@go install github.com/vektra/mockery/v2@latest
 	@rm -rf mocks/
-	@mockery
+	@mockery --all --inpackage --with-expecter=true
 	@echo "$(GREEN)✓ Mocks generated!$(NC)"
 
 .PHONY: test-with-mocks
