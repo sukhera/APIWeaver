@@ -1,0 +1,31 @@
+# APIWeaver Configuration File
+# This file demonstrates the configuration options available in APIWeaver
+
+# Parser settings
+strict_mode: false
+enable_recovery: true
+max_recovery_attempts: 3
+parser_timeout: 30s
+initial_slice_capacity: 100
+
+# Validation settings
+validation_level: "basic"  # Options: basic, strict, pedantic
+allowed_methods:
+  - "GET"
+  - "POST"
+  - "PUT"
+  - "PATCH"
+  - "DELETE"
+  - "HEAD"
+  - "OPTIONS"
+require_examples: false
+max_nesting_depth: 10
+
+# Logging and monitoring
+verbose: false
+enable_metrics: false
+enable_profiling: false
+
+# Output settings
+output_format: "json"  # Options: json, yaml, text
+pretty_print: true

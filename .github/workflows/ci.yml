@@ -1,0 +1,157 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  GO_VERSION: '1.24.6'
+  CGO_ENABLED: 0
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Cache Go modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Install and run mockery to generate mocks
+      run: |
+        go install github.com/vektra/mockery/v2@latest
+        mockery --all --inpackage --with-expecter=true
+
+    - name: Run tests
+      env:
+        CGO_ENABLED: 1
+      run: go test -v -race -coverprofile=coverage.out ./internal/... ./pkg/...
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.out
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Download Go modules
+      run: go mod download
+
+    - name: Install and run mockery to generate mocks
+      run: |
+        go install github.com/vektra/mockery/v2@latest
+        mockery --all --inpackage --with-expecter=true
+
+    - name: Install golangci-lint
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.3.1
+
+    - name: Run golangci-lint
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin
+        golangci-lint run --timeout=5m
+
+  # Frontend test job removed - Go-only project
+
+  # Integration tests and spec validation will be added when the API server is implemented
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    
+    strategy:
+      matrix:
+        goos: [linux, darwin]
+        goarch: [amd64, arm64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Download Go modules
+      run: go mod download
+
+    - name: Debug directory structure
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        echo "cmd directory contents:"
+        ls -la cmd/ || echo "cmd directory not found"
+        echo "cmd/apiweaver directory contents:"
+        ls -la cmd/apiweaver/ || echo "cmd/apiweaver directory not found"
+
+    - name: Build for ${{ matrix.goos }}/${{ matrix.goarch }}
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: 0
+      run: go build -ldflags="-s -w" -o "apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}" ./cmd/apiweaver
+
+    - name: Set artifact path
+      run: echo "ARTIFACT_PATH=apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}" >> "$GITHUB_ENV"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: ${{ env.ARTIFACT_PATH }}
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Run Go vulnerability check
+      run: |
+        go install golang.org/x/vuln/cmd/govulncheck@latest
+        govulncheck ./...
+
