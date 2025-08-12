@@ -111,6 +111,19 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
 
+    - name: Download Go modules
+      run: go mod download
+
+    - name: Debug directory structure
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        echo "cmd directory contents:"
+        ls -la cmd/ || echo "cmd directory not found"
+        echo "cmd/apiweaver directory contents:"
+        ls -la cmd/apiweaver/ || echo "cmd/apiweaver directory not found"
+
     - name: Build for ${{ matrix.goos }}/${{ matrix.goarch }}
       env:
         GOOS: ${{ matrix.goos }}
