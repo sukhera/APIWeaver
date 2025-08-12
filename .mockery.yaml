@@ -1,0 +1,8 @@
+with-expecter: true
+packages:
+  github.com/sukhera/APIWeaver/internal/domain/parser:
+    config:
+      outpkg: parser
+    interfaces:
+      Visitor:
+      Visitable:

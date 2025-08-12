@@ -1,0 +1,250 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  GO_VERSION: '1.24.6'
+
+jobs:
+  build-matrix:
+    name: Build Matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            goos: linux
+            goarch: amd64
+          - os: linux
+            arch: arm64
+            goos: linux
+            goarch: arm64
+          - os: darwin
+            arch: amd64
+            goos: darwin
+            goarch: amd64
+          - os: darwin
+            arch: arm64
+            goos: darwin
+            goarch: arm64
+          - os: windows
+            arch: amd64
+            goos: windows
+            goarch: amd64
+            ext: .exe
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
+    - name: Build binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: 0
+      run: |
+        # Embed frontend build
+        go generate ./...
+        
+        # Build with version info
+        VERSION=${GITHUB_REF#refs/tags/}
+        if [[ "$VERSION" == "refs/heads/"* ]]; then
+          VERSION=${GITHUB_SHA:0:8}
+        fi
+        
+        LDFLAGS="-s -w -X main.version=$VERSION -X main.commit=$GITHUB_SHA -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        
+        go build -ldflags="$LDFLAGS" -o apiweaver-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }} ./cmd/apiweaver
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: apiweaver-${{ matrix.os }}-${{ matrix.arch }}
+        path: apiweaver-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }}
+        retention-days: 30
+
+  test-binaries:
+    name: Test Built Binaries
+    runs-on: ${{ matrix.runner }}
+    needs: build-matrix
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            artifact: apiweaver-linux-amd64
+          - runner: macos-latest
+            artifact: apiweaver-darwin-amd64
+          - runner: windows-latest
+            artifact: apiweaver-windows-amd64
+            ext: .exe
+    
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ matrix.artifact }}
+
+    - name: Make binary executable (Unix)
+      if: runner.os != 'Windows'
+      run: chmod +x ${{ matrix.artifact }}
+
+    - name: Test binary version
+      run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          ./${{ matrix.artifact }}.exe version
+        else
+          ./${{ matrix.artifact }} version
+        fi
+
+    - name: Test binary help
+      run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          ./${{ matrix.artifact }}.exe --help
+        else
+          ./${{ matrix.artifact }} --help
+        fi
+
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    needs: build-matrix
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Download Linux binary
+      uses: actions/download-artifact@v4
+      with:
+        name: apiweaver-linux-amd64
+
+    - name: Make binary executable
+      run: chmod +x apiweaver-linux-amd64
+
+    - name: Run benchmarks
+      run: |
+        # Create test files of various sizes
+        mkdir -p benchmark-data
+        
+        # Small file
+        echo '## GET /test' > benchmark-data/small.md
+        
+        # Medium file  
+        cat > benchmark-data/medium.md << 'EOF'
+        ---
+        title: "Medium API"
+        ---
+        
+        ## GET /users
+        Get users
+        
+        | Parameter | Type | Required |
+        |-----------|------|----------|
+        | limit     | int  | false    |
+        
+        ```json
+        {"users": []}
+        ```
+        
+        ## POST /users
+        Create user
+        
+        ```json
+        {"name": "string"}
+        ```
+        EOF
+        
+        # Large file (100 endpoints)
+        echo '---' > benchmark-data/large.md
+        echo 'title: "Large API"' >> benchmark-data/large.md
+        echo '---' >> benchmark-data/large.md
+        for i in {1..100}; do
+          echo "## GET /endpoint$i" >> benchmark-data/large.md
+          echo "Endpoint $i description" >> benchmark-data/large.md
+          echo "" >> benchmark-data/large.md
+        done
+        
+        # Benchmark generation times
+        echo "=== Performance Benchmarks ==="
+        
+        echo "Small file:"
+        time ./apiweaver-linux-amd64 generate benchmark-data/small.md -o /tmp/small.yaml
+        
+        echo "Medium file:"
+        time ./apiweaver-linux-amd64 generate benchmark-data/medium.md -o /tmp/medium.yaml
+        
+        echo "Large file:"
+        time ./apiweaver-linux-amd64 generate benchmark-data/large.md -o /tmp/large.yaml
+        
+        # Memory usage test
+        echo "Memory usage test:"
+        /usr/bin/time -v ./apiweaver-linux-amd64 generate benchmark-data/large.md -o /tmp/memory-test.yaml 2>&1 | grep "Maximum resident set size"
+
+  size-report:
+    name: Binary Size Report
+    runs-on: ubuntu-latest
+    needs: build-matrix
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Generate size report
+      run: |
+        echo "# Binary Size Report" > size-report.md
+        echo "" >> size-report.md
+        echo "| Platform | Architecture | Size | Compressed |" >> size-report.md
+        echo "|----------|--------------|------|------------|" >> size-report.md
+        
+        for artifact in apiweaver-*; do
+          if [ -d "$artifact" ]; then
+            cd "$artifact"
+            file=$(ls apiweaver-* | head -1)
+            size=$(stat -c%s "$file" | numfmt --to=iec)
+            gzip -c "$file" > "${file}.gz"
+            compressed_size=$(stat -c%s "${file}.gz" | numfmt --to=iec)
+            
+            # Extract platform and arch from filename
+            platform=$(echo "$file" | cut -d'-' -f2)
+            arch=$(echo "$file" | cut -d'-' -f3 | sed 's/\.exe$//')
+            
+            echo "| $platform | $arch | $size | $compressed_size |" >> ../size-report.md
+            cd ..
+          fi
+        done
+        
+        cat size-report.md
+
+    - name: Upload size report
+      uses: actions/upload-artifact@v4
+      with:
+        name: size-report
+        path: size-report.md
