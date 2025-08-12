@@ -96,11 +96,8 @@ jobs:
     
     strategy:
       matrix:
-        goos: [linux, darwin, windows]
+        goos: [linux, darwin]
         goarch: [amd64, arm64]
-        exclude:
-          - goos: windows
-            goarch: arm64
     
     steps:
     - name: Checkout code
@@ -129,20 +126,10 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
         CGO_ENABLED: 0
-      run: |
-        if [ "${{ matrix.goos }}" = "windows" ]; then
-          go build -ldflags="-s -w" -o "apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}.exe" ./cmd/apiweaver
-        else
-          go build -ldflags="-s -w" -o "apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}" ./cmd/apiweaver
-        fi
+      run: go build -ldflags="-s -w" -o "apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}" ./cmd/apiweaver
 
     - name: Set artifact path
-      run: |
-        if [ "${{ matrix.goos }}" = "windows" ]; then
-          echo "ARTIFACT_PATH=apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}.exe" >> "$GITHUB_ENV"
-        else
-          echo "ARTIFACT_PATH=apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}" >> "$GITHUB_ENV"
-        fi
+      run: echo "ARTIFACT_PATH=apiweaver-${{ matrix.goos }}-${{ matrix.goarch }}" >> "$GITHUB_ENV"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
