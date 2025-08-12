@@ -3,7 +3,7 @@ packages:
   github.com/sukhera/APIWeaver/internal/domain/parser:
     config:
       inpackage: false
-      outpkg: parser
+      outpkg: "parser"
     interfaces:
       Visitor:
       Visitable:

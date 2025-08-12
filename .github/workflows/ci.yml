@@ -40,7 +40,7 @@ jobs:
     - name: Install and run mockery to generate mocks
       run: |
         go install github.com/vektra/mockery/v2@latest
-        mockery
+        mockery --all --inpackage --with-expecter=true
 
     - name: Run tests
       env:
@@ -74,7 +74,7 @@ jobs:
     - name: Install and run mockery to generate mocks
       run: |
         go install github.com/vektra/mockery/v2@latest
-        mockery
+        mockery --all --inpackage --with-expecter=true
 
     - name: Install golangci-lint
       run: |
