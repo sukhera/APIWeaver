@@ -38,6 +38,8 @@ jobs:
       run: go mod download
 
     - name: Run tests
+      env:
+        CGO_ENABLED: 1
       run: go test -v -race -coverprofile=coverage.out ./internal/... ./pkg/... ./cmd/...
 
     - name: Upload coverage to Codecov
@@ -64,7 +66,7 @@ jobs:
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v6
       with:
-        version: latest
+        version: v1.64.8
         args: --timeout=5m
 
   # Frontend test job removed - Go-only project
@@ -136,3 +138,19 @@ jobs:
       run: |
         go install golang.org/x/vuln/cmd/govulncheck@latest
         govulncheck ./...
+
+    - name: Run Gosec Security Scanner
+      run: |
+        # Install gosec using go install for better reliability
+        go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+        # Run gosec with proper configuration
+        gosec -fmt=json -out=security-report.json ./internal/... ./pkg/... ./cmd/... || true
+        # Also run with text output for logs
+        gosec ./internal/... ./pkg/... ./cmd/...
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-report
+        path: security-report.json

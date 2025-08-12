@@ -1,0 +1,223 @@
+{
+  "global": {
+    "nosec": "enabled",
+    "audit": "enabled"
+  },
+  "rules": {
+    "G101": {
+      "pattern": "password",
+      "message": "Potential hardcoded credentials",
+      "severity": "HIGH",
+      "confidence": "MEDIUM"
+    },
+    "G102": {
+      "pattern": "bind",
+      "message": "Binding to all interfaces can grant access to other interfaces",
+      "severity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    "G103": {
+      "pattern": "unsafe",
+      "message": "Use of unsafe calls should be audited",
+      "severity": "LOW",
+      "confidence": "HIGH"
+    },
+    "G104": {
+      "pattern": "errors",
+      "message": "Errors unhandled",
+      "severity": "LOW",
+      "confidence": "HIGH"
+    },
+    "G105": {
+      "pattern": "rand",
+      "message": "Use of weak random number generator (math/rand instead of crypto/rand)",
+      "severity": "MEDIUM",
+      "confidence": "MEDIUM"
+    },
+    "G106": {
+      "pattern": "ssh.InsecureIgnoreHostKey",
+      "message": "Use of ssh.InsecureIgnoreHostKey should be audited",
+      "severity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    "G107": {
+      "pattern": "http",
+      "message": "Potential HTTP request made with variable url",
+      "severity": "MEDIUM",
+      "confidence": "MEDIUM"
+    },
+    "G108": {
+      "pattern": "profiling",
+      "message": "Profiling endpoint is automatically exposed on /debug/pprof",
+      "severity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    "G109": {
+      "pattern": "strconv",
+      "message": "Converting strconv.Atoi result to int32/int16",
+      "severity": "LOW",
+      "confidence": "HIGH"
+    },
+    "G110": {
+      "pattern": "http",
+      "message": "Potential DoS vulnerability via decompression bomb",
+      "severity": "MEDIUM",
+      "confidence": "MEDIUM"
+    },
+    "G111": {
+      "pattern": "http",
+      "message": "Potential directory traversal via Zip Slip",
+      "severity": "MEDIUM",
+      "confidence": "MEDIUM"
+    },
+    "G112": {
+      "pattern": "http",
+      "message": "Potential Slowloris Attack because ReadHeaderTimeout is not configured in the http.Server",
+      "severity": "MEDIUM",
+      "confidence": "MEDIUM"
+    },
+    "G113": {
+      "pattern": "http",
+      "message": "Use of http package with missing timeout",
+      "severity": "LOW",
+      "confidence": "HIGH"
+    },
+    "G114": {
+      "pattern": "http",
+      "message": "Use of net/http serve function that has no support for setting timeouts",
+      "severity": "LOW",
+      "confidence": "HIGH"
+    },
+    "G201": {
+      "pattern": "sql",
+      "message": "SQL string concatenation",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G202": {
+      "pattern": "sql",
+      "message": "SQL string formatting",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G203": {
+      "pattern": "template",
+      "message": "Use of unescaped data in HTML templates",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G204": {
+      "pattern": "exec",
+      "message": "Audit use of command execution",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G301": {
+      "pattern": "mkdir",
+      "message": "Poor file permissions used when creating a directory",
+      "severity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    "G302": {
+      "pattern": "chmod",
+      "message": "Poor file permissions used with chmod",
+      "severity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    "G303": {
+      "pattern": "temp",
+      "message": "Creating a tempfile using a predictable path",
+      "severity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    "G304": {
+      "pattern": "filepath",
+      "message": "Potential file inclusion via variable",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G305": {
+      "pattern": "zip",
+      "message": "File traversal when extracting zip archive",
+      "severity": "MEDIUM",
+      "confidence": "MEDIUM"
+    },
+    "G306": {
+      "pattern": "write",
+      "message": "Poor file permissions used when writing to a file",
+      "severity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    "G307": {
+      "pattern": "defer",
+      "message": "Unsafe defer call of a method returning an error",
+      "severity": "LOW",
+      "confidence": "HIGH"
+    },
+    "G401": {
+      "pattern": "crypto",
+      "message": "Detection of the usage of DES, RC4, MD5 or SHA1",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G402": {
+      "pattern": "tls",
+      "message": "Look for bad TLS connection settings",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G403": {
+      "pattern": "rsa",
+      "message": "Ensure minimum RSA key length of 2048 bits",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G404": {
+      "pattern": "rand",
+      "message": "Use of weak random number generator (math/rand instead of crypto/rand)",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G501": {
+      "pattern": "import",
+      "message": "Import blacklist: crypto/md5",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G502": {
+      "pattern": "import",
+      "message": "Import blacklist: crypto/des",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G503": {
+      "pattern": "import",
+      "message": "Import blacklist: crypto/rc4",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G504": {
+      "pattern": "import",
+      "message": "Import blacklist: net/http/cgi",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G505": {
+      "pattern": "import",
+      "message": "Import blacklist: crypto/sha1",
+      "severity": "HIGH",
+      "confidence": "HIGH"
+    },
+    "G601": {
+      "pattern": "range",
+      "message": "Implicit memory aliasing in for loop",
+      "severity": "LOW",
+      "confidence": "HIGH"
+    }
+  },
+  "exclude": [
+    "mocks/",
+    "testutil/",
+    "vendor/"
+  ]
+}
