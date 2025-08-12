@@ -77,5 +77,5 @@ logs/
 bin/
 dist/
 build/
-apiweaver
+apiweaver-*
 CLAUDE.md
