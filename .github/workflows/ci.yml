@@ -154,7 +154,7 @@ jobs:
     - name: Install golangci-lint
       uses: golangci/golangci-lint-action@v6
       with:
-        version: latest
+        version: v1.64.8
         args: --timeout=5m
 
   frontend-test:
@@ -225,7 +225,7 @@ jobs:
     - name: Check for unused dependencies
       run: |
         cd web
-        npx depcheck --ignores="@types/*,@typescript-eslint/*,@vitejs/*,@testing-library/*,tailwindcss*,postcss*,autoprefixer,prettier*"
+        npx depcheck --ignores="@types/*,@typescript-eslint/*,@vitejs/*,@testing-library/*,tailwindcss*,postcss*,autoprefixer,prettier*,@vitest/coverage-v8"
 
   frontend-build:
     name: Frontend Build
