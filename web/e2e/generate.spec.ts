@@ -45,7 +45,7 @@ test.describe('Generate Page', () => {
       await fileInput.setInputFiles({
         name: 'test-api.md',
         mimeType: 'text/markdown',
-        buffer: Buffer.from(testContent)
+        buffer: new TextEncoder().encode(testContent)
       });
       
       // Check for success indication
@@ -79,7 +79,7 @@ test.describe('Generate Page', () => {
         await page.waitForTimeout(2000);
         
         // Check for results area or loading state
-        const resultsVisible = await page.locator('[data-testid="results"], [data-testid="output"], .loading').isVisible();
+        await page.locator('[data-testid="results"], [data-testid="output"], .loading').isVisible();
         // This is expected behavior - either results show or loading state appears
       }
     }
@@ -94,7 +94,7 @@ test.describe('Generate Page', () => {
       
       // Look for error messages
       await page.waitForTimeout(1000);
-      const hasErrorIndicator = await page.locator('.error, [role="alert"], .text-red-500, .text-destructive').isVisible();
+      await page.locator('.error, [role="alert"], .text-red-500, .text-destructive').isVisible();
       
       // Error handling should be present (either validation or user feedback)
       // This test verifies the UI handles invalid states gracefully
