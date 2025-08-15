@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Background */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --surface: 0 0% 100%;
+    --surface-elevated: 0 0% 100%;
+    
+    /* Card */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    
+    /* Primary - Blue */
+    --primary: 214 95% 67%;
+    --primary-foreground: 210 40% 98%;
+    
+    /* Secondary */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    
+    /* Muted */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    /* Accent */
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* Border */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 214 95% 67%;
+    
+    /* Text colors */
+    --text-primary: 222.2 84% 4.9%;
+    --text-secondary: 215.4 16.3% 46.9%;
+    --text-tertiary: 220 14.3% 65.9%;
+    
+    /* Status colors */
+    --success: 152 81% 39%;    /* Emerald 600 */
+    --warning: 43 96% 50%;     /* Amber 500 */
+    --error: 0 84.2% 60.2%;    /* Red 500 */
+    --info: 214 95% 67%;       /* Blue 500 */
+    
+    /* Border radius */
+    --radius: 0.5rem;
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'SF Mono', Consolas, 'Liberation Mono', monospace;
+  }
+
+  .dark {
+    /* Background */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --surface: 222.2 84% 4.9%;
+    --surface-elevated: 217.2 32.6% 17.5%;
+    
+    /* Card */
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    
+    /* Popover */
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    
+    /* Primary */
+    --primary: 214 95% 67%;
+    --primary-foreground: 222.2 84% 4.9%;
+    
+    /* Secondary */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    
+    /* Muted */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    /* Accent */
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    
+    /* Destructive */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* Border */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 214 95% 67%;
+    
+    /* Text colors */
+    --text-primary: 210 40% 98%;
+    --text-secondary: 215 20.2% 65.1%;
+    --text-tertiary: 217.9 10.6% 64.9%;
+    
+    /* Status colors */
+    --success: 152 76% 36%;    /* Emerald 500 dark */
+    --warning: 43 89% 38%;     /* Amber 400 dark */
+    --error: 0 62.8% 30.6%;    /* Red 600 dark */
+    --info: 214 88% 52%;       /* Blue 400 dark */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-family);
+  }
+  
+  code, pre {
+    font-family: var(--font-family-mono);
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  .safe-area-inset {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  }
+  
+  .focus-ring-dark {
+    @apply dark:focus:ring-offset-gray-900;
+  }
+  
+  /* Screen reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  /* Monaco Editor integration */
+  .monaco-editor {
+    @apply rounded-md border border-border;
+  }
+  
+  /* Diff viewer styles */
+  .diff-line-added {
+    @apply bg-green-50 border-l-4 border-green-500 text-green-900;
+  }
+  
+  .diff-line-removed {
+    @apply bg-red-50 border-l-4 border-red-500 text-red-900;
+  }
+  
+  .diff-line-modified {
+    @apply bg-blue-50 border-l-4 border-blue-500 text-blue-900;
+  }
+  
+  .diff-line-unchanged {
+    @apply bg-gray-50 border-l-4 border-gray-200 text-gray-700;
+  }
+  
+  /* Dark theme diff styles */
+  .dark .diff-line-added {
+    @apply bg-green-900/20 border-green-400 text-green-100;
+  }
+  
+  .dark .diff-line-removed {
+    @apply bg-red-900/20 border-red-400 text-red-100;
+  }
+  
+  .dark .diff-line-modified {
+    @apply bg-blue-900/20 border-blue-400 text-blue-100;
+  }
+  
+  .dark .diff-line-unchanged {
+    @apply bg-gray-800 border-gray-600 text-gray-300;
+  }
+  
+  /* Status indicators */
+  .status-validating {
+    @apply animate-pulse text-blue-500 bg-blue-50;
+  }
+  
+  .status-valid {
+    @apply text-green-600 bg-green-50;
+  }
+  
+  .status-invalid {
+    @apply text-red-600 bg-red-50;
+  }
+  
+  .status-warning {
+    @apply text-amber-600 bg-amber-50;
+  }
+  
+  /* Dark theme status styles */
+  .dark .status-validating {
+    @apply bg-blue-900/20 text-blue-400;
+  }
+  
+  .dark .status-valid {
+    @apply bg-green-900/20 text-green-400;
+  }
+  
+  .dark .status-invalid {
+    @apply bg-red-900/20 text-red-400;
+  }
+  
+  .dark .status-warning {
+    @apply bg-amber-900/20 text-amber-400;
+  }
+}

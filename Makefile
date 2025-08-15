@@ -263,3 +263,27 @@ $(BUILD_DIR):
 
 $(DIST_DIR):
 	mkdir -p $(DIST_DIR)
+
+# Frontend targets
+.PHONY: build-frontend dev-frontend test-frontend lint-frontend type-check-frontend
+build-frontend: ## Build frontend for production
+	@echo "🏗️  Building frontend for production..."
+	@cd web && ./scripts/embed-build.sh
+
+dev-frontend: ## Start frontend development server
+	@echo "🚀 Starting frontend development server..."
+	@cd web && npm run dev
+
+test-frontend: ## Run frontend tests
+	@echo "🧪 Running frontend tests..."
+	@cd web && npm run test:run
+
+lint-frontend: ## Lint frontend code
+	@echo "🔍 Linting frontend code..."
+	@cd web && npm run lint
+
+type-check-frontend: ## Type check frontend code
+	@echo "🔍 Type checking frontend code..."
+	@cd web && npm run type-check
+
+# TODO: Add Go embedding targets when web server is implemented

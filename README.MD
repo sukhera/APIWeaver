@@ -1,7 +1,7 @@
 # APIWeaver
 
-A production-ready Go-based developer tool and service that generates and amends OpenAPI 3.1 specifications from Markdown API requirements, natural language descriptions, and structured JSON. Single binary with CLI, HTTP API, and embedded web UI.
-Backend is Go + MongoDB; frontend is React + Tailwind
+A Go-based developer tool that generates OpenAPI 3.1 specifications from Markdown API requirements. 
+Single binary with CLI and embedded web UI.
 
 [![CI](https://github.com/sukhera/APIWeaver/actions/workflows/ci.yml/badge.svg)](https://github.com/sukhera/APIWeaver/actions/workflows/ci.yml)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)](https://golang.org/)
@@ -14,14 +14,20 @@ Backend is Go + MongoDB; frontend is React + Tailwind
 
 ## What This Is
 
-A lightweight OpenAPI specification generator and amender that converts Markdown requirements directly into valid OpenAPI 3.1 specs. Built with enterprise-grade Go patterns, AST-based parsing, and production-ready infrastructure automation.What This Is
-A lightweight OpenAPI specification generator and amender that converts Markdown requirements directly into valid OpenAPI 3.1 specs. Built with enterprise-grade Go patterns, AST-based parsing, and production-ready infrastructure automation.
-Problem Solved
-Maintaining OpenAPI specs manually is slow and error-prone. Most teams already write Markdown requirements in PRDs, tickets, or wikis — but translating those into accurate OpenAPI specs requires extra effort. APIWeaver bridges this gap by directly converting your existing documentation into valid OpenAPI specifications.
+A lightweight OpenAPI specification generator that converts Markdown requirements 
+directly into valid OpenAPI 3.1 specs. Built with enterprise-grade Go patterns, AST-based 
+parsing, and production-ready infrastructure automation.
+
+### Problem Solved
+
+Maintaining OpenAPI specs manually is slow and error-prone. Most teams already write Markdown 
+requirements in PRDs, tickets, or wikis — but translating those into accurate OpenAPI specs 
+requires extra effort. APIWeaver bridges this gap by directly converting your existing 
+documentation into valid OpenAPI specifications.
 
 ## Web Interface
 
-APIWeaver includes a powerful embedded web UI that provides an intuitive interface for working with your API specifications:
+APIWeaver includes a powerful embedded web UI that provides an intuitive interface for working with your API specifications.
 
 ## Who is APIWeaver For?
 
@@ -33,11 +39,9 @@ APIWeaver includes a powerful embedded web UI that provides an intuitive interfa
 ## Features
 
 - 📝 **Markdown to OpenAPI** - Convert requirements.md directly to openapi.yaml
-- 🔄 **Spec Amendment** - Update existing specs via Markdown changes or plain text
 - ✅ **Validation Engine** - Comprehensive spec validation with actionable feedback
-- 🔍 **Diff Preview** - See changes before applying amendments
 - ⚡ **High Performance** - AST-based parsing with concurrent processing
-- 🐳 **Production Ready** - Single binary with CLI, API, and embedded web UI
+- 🐳 **Production Ready** - Single binary with CLI and embedded web UI
 - 📈 **Observability** - Structured logging and comprehensive error handling
 - 🛠️ **Infrastructure Automation** - Comprehensive Makefile and CI/CD pipeline
 
@@ -46,189 +50,53 @@ APIWeaver includes a powerful embedded web UI that provides an intuitive interfa
 ```bash
 git clone https://github.com/sukhera/APIWeaver.git
 cd APIWeaver
-cp .env.example .env
-make dev
+make setup
 ```
 
 ### Access Points
 
 - **Web UI**: <http://localhost:8080> (embedded in binary)
-- **API Health**: <http://localhost:8080/api/health>
 - **CLI Tool**: `./apiweaver parse requirements.md`
-- **API Endpoint**: <http://localhost:8080/api/v1/generate>
 
 ## Configuration
 
-Configuration is env-first; `.env` sets ports/URIs for dev, compose wires containers; prod uses environment/secret manager.
+Configuration is handled through YAML config files and command-line flags.
 
-- **Environment**: Copy `.env.example` to `.env` and customize
-- **YAML Config**: See `config.yaml` for structured configuration
-- **Precedence**: Environment variables > flags > config file > defaults
+- **YAML Config**: See `config.yaml.sample` for structured configuration
+- **Precedence**: Command-line flags > config file > defaults
 
-Key settings:
-
-```bash
-PORT=8080                           # Server port
-LOG_LEVEL=info                      # Logging verbosity
-STRICT_MODE=false                   # Strict parsing mode
-PARSER_TIMEOUT=30s                  # Parser timeout
-VALIDATION_LEVEL=basic              # Validation strictness
-OUTPUT_FORMAT=json                  # Output format (json/yaml/text)
-```
+Key settings: See `config.yaml.sample` for complete configuration options.
 
 ## Project Structure
 
-```Directory Structure
+```bash
 ├── cmd/                    # Application entrypoints
-│   └── apiweaver/         # CLI and API server binary
+│   └── apiweaver/         # CLI binary
 ├── internal/              # Private application code
 │   ├── config/           # Configuration management
-│   ├── domain/           # Core business logic
-│   │   ├── parser/       # AST-based markdown parser
-│   │   ├── builder/      # OpenAPI spec builders
-│   │   └── strategies/   # Parsing strategies
-│   └── application/      # HTTP handlers and routes
+│   └── domain/           # Core business logic
+│       ├── parser/       # AST-based markdown parser
+│       └── builder/      # OpenAPI spec builders
 ├── pkg/                   # Public packages
 │   └── errors/           # Error handling utilities
+├── web/                   # React frontend
 ├── docs/                  # Documentation and guides
-├── testutil/             # Test utilities and helpers
-```
-
-→ **Full structure**: See [docs/architecture.md](docs/architecture.md)
-
-## API
-
-### Generate OpenAPI Spec
-
-```bash
-POST /api/v1/generate
-Content-Type: application/json
-
-
-```json
-{
-  "content": "# User API\n\n## GET /users\nReturns a list of users...",
-  "format": "yaml",
-  "strict_mode": false
-}
-```
-
-```json
-{
-  "openapi": "3.1.0",
-  "info": {
-    "title": "User API",
-    "version": "1.0.0"
-  },
-  "paths": {
-    "/users": {
-      "get": {
-        "summary": "Returns a list of users"
-      }
-    }
-  }
-}
-```
-
-### Amend Existing Spec
-
-```bash
-POST /api/v1/amend
-Content-Type: application/json
-```
-
-```json
-{
-  "original_spec": "...",
-  "changes": "Add POST /users endpoint for creating new users",
-  "format": "yaml"
-}
-```
-
-### Validate Spec
-
-```bash
-POST /api/v1/validate
-Content-Type: application/json
-```
-
-```json
-{
-  "spec": "...",
-  "validation_level": "strict"
-}
+└── testutil/             # Test utilities and helpers
 ```
 
 ## Markdown Parser Architecture
 
-The system uses **AST-based parsing** with **Visitor pattern** for modular, extensible OpenAPI generation:
+The system uses **AST-based parsing** with **Visitor pattern** for modular, extensible OpenAPI 
+generation:
 
 - **AST Construction**: Parse Markdown into structured Abstract Syntax Tree
 - **Visitor Pattern**: Traverse AST to generate OpenAPI components
 - **Strategy Pattern**: Multiple parsing strategies for different content types
 - **Functional Options**: Flexible configuration with builder pattern
 
-Design patterns used here are documented under `/docs`—the README stays high-level so you can find what you need fast.
-
-→ **Implementation details**: [docs/design-patterns.md](docs/design-patterns.md)
-
 ## Markdown Input Format
 
-### File Structure
-
-1. **Optional frontmatter** (YAML)
-2. **API metadata** title, version, servers, security
-3. **Endpoint sections** `## METHOD /path`
-4. **Parameter and response tables**
-5. **Request/response schemas** in fenced JSON/YAML blocks
-6. **Reusable components** defined at the bottom
-
-### Frontmatter Example
-
-```yaml
----
-title: User API
-version: 1.0.0
-servers:
-  - url: https://api.example.com
-security:
-  - bearerAuth: []
----
-```
-
-### Endpoint Example
-
-```markdown
-## GET /users
-
-Returns a list of users.
-
-### Parameters
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| page | integer | No | Page number |
-| limit | integer | No | Items per page |
-
-### Responses
-| Code | Description |
-|------|-------------|
-| 200 | Success |
-| 400 | Bad Request |
-
-### Response Schema
-```json
-{
-  "type": "object",
-  "properties": {
-    "users": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/User"
-      }
-    }
-  }
-}
-```
+APIWeaver parses Markdown files with OpenAPI specifications. See `docs/markdown-format.md` for detailed format documentation.
 
 ## CLI Usage
 
@@ -249,33 +117,6 @@ cat requirements.md | ./apiweaver parse - --output openapi.json
   --verbose
 ```
 
-## Observability
-
-- **Structured Logging**: Context-aware with trace correlation
-- **Performance Metrics**: Parsing time, memory usage, throughput
-- **Error Tracking**: Comprehensive error wrapping with stack traces
-- **Health Checks**: Service health and dependency status
-
-## Deployment
-
-### Docker Compose
-
-Production-ready setup with `docker-compose.yml` featuring API server with embedded web UI and MongoDB for API key management.
-
-```bash
-make prod    # Start production environment
-```
-
-### Single Binary
-
-```bash
-# Build for your platform
-make build
-
-# Run directly
-./apiweaver serve --port 8080
-```
-
 ## Development Commands
 
 Run `make help` to see the full toolbox; this README only shows the commands you'll use daily.
@@ -291,6 +132,12 @@ make generate-mocks  # Generate mocks using Mockery
 make build           # Build all components
 make clean           # Clean build artifacts
 make docs            # Generate documentation
+
+# Web Development
+make dev-frontend    # Start frontend development server
+make build-frontend  # Build frontend for production
+make test-frontend   # Run frontend tests
+make lint-frontend   # Lint frontend code
 ```
 
 ## Project Status
@@ -302,12 +149,14 @@ make docs            # Generate documentation
 - Comprehensive configuration management
 - Mockery integration with expecter pattern
 - CI/CD pipeline with automated testing
+- React frontend with embedded web UI
+- Frontend build and integration scripts
 
 ### 🚧 Roadmap
 
+- HTTP API server implementation
 - Docker Compose deployment setup
 - Structured logging and error handling
-- Embedded web UI for easy interaction
 - CLI tool with full feature parity
 - Comprehensive test coverage (95%+)
 - Production-ready HTTP server with security hardening
@@ -318,6 +167,10 @@ make docs            # Generate documentation
 - Advanced validation rules and custom validators
 - Plugin system for custom parsers
 - Prometheus metrics integration
+- Template library for common API patterns
+- WebSocket support for real-time updates
+- Multi-language support (Python, JavaScript SDKs)
+- Git integration for version control
 
 ## Contributing
 
@@ -331,5 +184,3 @@ make docs            # Generate documentation
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
