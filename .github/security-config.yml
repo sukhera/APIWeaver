@@ -1,0 +1,137 @@
+# APIWeaver Security Configuration
+# This file defines security scanning parameters and thresholds
+
+# Vulnerability scanning configuration
+vulnerability_scanning:
+  # Fail build on these severity levels
+  fail_on_severity:
+    - "CRITICAL"
+    - "HIGH"
+  
+  # Warn but don't fail on these severity levels
+  warn_on_severity:
+    - "MEDIUM"
+    - "LOW"
+  
+  # Maximum allowed vulnerabilities by severity
+  max_vulnerabilities:
+    CRITICAL: 0
+    HIGH: 0
+    MEDIUM: 5
+    LOW: 10
+
+# Static analysis configuration
+static_analysis:
+  # Gosec rules to enable (empty means all)
+  gosec_rules: []
+  
+  # Gosec rules to exclude
+  gosec_exclude:
+    - "G104" # Audit errors not checked (too noisy for development)
+  
+  # CodeQL queries to run
+  codeql_queries:
+    - "security-extended"
+    - "security-and-quality"
+
+# Secret scanning configuration
+secret_scanning:
+  # File patterns to exclude from secret scanning
+  exclude_patterns:
+    - "*.test"
+    - "*.example"
+    - "testdata/*"
+    - "*/mocks/*"
+    - "go.sum"
+  
+  # Additional secret patterns to detect
+  custom_patterns:
+    - name: "Custom API Key"
+      pattern: "(?i)(custom_api_key)\\s*[:=]\\s*['\"][a-zA-Z0-9]{20,}['\"]"
+    - name: "Database Password"
+      pattern: "(?i)(db_password|database_password)\\s*[:=]\\s*['\"][^'\"]+['\"]"
+
+# License compliance configuration
+license_compliance:
+  # Allowed license types
+  allowed_licenses:
+    - "MIT"
+    - "Apache-2.0"
+    - "BSD-2-Clause"
+    - "BSD-3-Clause"
+    - "ISC"
+    - "MPL-2.0"
+  
+  # Forbidden license types
+  forbidden_licenses:
+    - "GPL-2.0"
+    - "GPL-3.0"
+    - "AGPL-3.0"
+    - "LGPL-2.1"
+    - "LGPL-3.0"
+
+# Supply chain security configuration
+supply_chain:
+  # Require SBOM generation
+  require_sbom: true
+  
+  # Check for replace directives in go.mod
+  check_replace_directives: true
+  
+  # Verify module checksums
+  verify_checksums: true
+  
+  # Maximum dependency depth allowed
+  max_dependency_depth: 10
+
+# Container security configuration (when applicable)
+container_security:
+  # Dockerfile security checks
+  dockerfile_checks:
+    - "DL3000" # Use absolute WORKDIR
+    - "DL3001" # For some bash commands it makes no sense running them in a Docker container
+    - "DL3002" # Last USER should not be root
+    - "DL3003" # Use WORKDIR to switch to a directory
+    - "DL3004" # Do not use sudo as it leads to unpredictable behavior
+    - "DL3006" # Always tag the version of an image explicitly
+    - "DL3007" # Using latest is prone to errors if the image will ever update
+    - "DL3008" # Pin versions in apt get install
+    - "DL3009" # Delete the apt-get lists after installing something
+    - "DL3010" # Use ADD for extracting archives into an image
+  
+  # Image scanning severity threshold
+  image_scan_severity: "HIGH"
+
+# Reporting configuration
+reporting:
+  # Generate comprehensive reports
+  generate_detailed_reports: true
+  
+  # Upload all scan results as artifacts
+  upload_artifacts: true
+  
+  # Notification settings
+  notifications:
+    on_failure: true
+    on_success: false
+    
+  # Report formats to generate
+  formats:
+    - "json"
+    - "sarif"
+    - "markdown"
+    - "txt"
+
+# Scan scheduling
+scheduling:
+  # Run full security scan on push to main
+  on_push_main: true
+  
+  # Run nightly comprehensive scans
+  nightly_scan: true
+  nightly_time: "02:00" # UTC
+  
+  # Run weekly dependency update check
+  weekly_dependency_check: true
+  weekly_day: "sunday"
+  weekly_time: "03:00" # UTC
