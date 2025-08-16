@@ -222,7 +222,7 @@ jobs:
     - name: Check for unused dependencies
       run: |
         cd web
-        npx depcheck --ignores="@types/*,@typescript-eslint/*,@vitejs/*,@testing-library/*,tailwindcss*,postcss*,autoprefixer,prettier*,@vitest/coverage-v8"
+        npx depcheck --ignores="@types/*,@typescript-eslint/*,@vitejs/*,@testing-library/*,tailwindcss*,postcss*,autoprefixer,prettier*,@vitest/coverage-v8,wait-on"
 
   frontend-build:
     name: Frontend Build
