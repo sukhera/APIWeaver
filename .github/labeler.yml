@@ -11,7 +11,7 @@ backend:
 
 # Frontend changes  
 frontend:
-  - "frontend/**/*"
+  - "web/**/*"
 
 # Parser changes
 parser:
@@ -48,7 +48,7 @@ ci:
 dependencies:
   - "go.mod"
   - "go.sum"
-  - "frontend/package*.json"
+  - "web/package*.json"
 
 # Tests
 tests:
@@ -60,7 +60,31 @@ tests:
 security:
   - ".github/workflows/security.yml"
   - "SECURITY.md"
+  - "**/security/**/*"
+  - "**/*security*"
 
 # Breaking changes (manual label)
 breaking-change:
   - ""
+
+# Infrastructure changes
+infrastructure:
+  - "infra/**/*"
+  - "docker/**/*"
+  - "kubernetes/**/*"
+  - "terraform/**/*"
+
+# Performance changes
+performance:
+  - "**/*performance*"
+  - "**/*benchmark*"
+
+# Bug fixes
+bug:
+  - "**/*bug*"
+  - "**/*fix*"
+
+# Feature additions
+feature:
+  - "**/*feature*"
+  - "**/*enhancement*"
