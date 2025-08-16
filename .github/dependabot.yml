@@ -1,83 +1,82 @@
 version: 2
 updates:
-  # Go modules
+  # Go modules - Security updates only
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "09:00"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "sukhera"
+    open-pull-requests-limit: 5
     assignees:
       - "sukhera"
     commit-message:
-      prefix: "go"
+      prefix: "security"
       include: "scope"
     labels:
+      - "security"
       - "dependencies"
       - "go"
+    # Only create PRs for security updates
+    ignore:
+      # Ignore all regular version updates, only allow security updates
+      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
 
-  # Frontend dependencies
+  # Frontend dependencies - Security updates only
   - package-ecosystem: "npm"
-    directory: "/frontend"
+    directory: "/web"
     schedule:
-      interval: "weekly"
-      day: "monday"  
+      interval: "daily"
       time: "09:00"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "sukhera"
+    open-pull-requests-limit: 5
     assignees:
       - "sukhera"
     commit-message:
-      prefix: "npm"
+      prefix: "security"
       include: "scope"
     labels:
+      - "security"
       - "dependencies"
       - "frontend"
     ignore:
-      # Ignore major version updates for these packages
-      - dependency-name: "react"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react-dom"
-        update-types: ["version-update:semver-major"]
+      # Ignore all regular version updates, only allow security updates
+      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
 
-  # GitHub Actions
+  # GitHub Actions - Security updates only
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "09:00"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "sukhera"
+    open-pull-requests-limit: 3
     assignees:
       - "sukhera"
     commit-message:
-      prefix: "ci"
+      prefix: "security"
       include: "scope"
     labels:
+      - "security"
       - "dependencies"
       - "ci"
+    ignore:
+      # Ignore all regular version updates, only allow security updates
+      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
 
-  # Docker dependencies
+  # Docker dependencies - Security updates only
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "09:00"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "sukhera"
+    open-pull-requests-limit: 3
     assignees:
       - "sukhera"
     commit-message:
-      prefix: "docker"
+      prefix: "security"
       include: "scope"
     labels:
+      - "security"
       - "dependencies"
       - "docker"
+    ignore:
+      # Ignore all regular version updates, only allow security updates
+      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
