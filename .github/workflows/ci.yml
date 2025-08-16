@@ -107,7 +107,6 @@ jobs:
         file: ./coverage.out
         flags: unittests
         name: codecov-umbrella
-        fail_ci_if_error: false
 
   lint:
     name: Lint
@@ -188,7 +187,6 @@ jobs:
         file: ./web/coverage/coverage-final.json
         flags: frontend
         name: frontend-coverage
-        fail_ci_if_error: false
         directory: ./web
 
   frontend-lint:
@@ -217,7 +215,6 @@ jobs:
         npm run lint
 
     - name: Run TypeScript type checking
-      continue-on-error: true  # Allow TypeScript errors for now during development
       run: |
         cd web
         npm run type-check
@@ -320,16 +317,37 @@ jobs:
         name: frontend-build
         path: web/dist/
 
+
+
     - name: Start preview server
       run: |
         cd web
-        npm run preview &
-        npx wait-on http://localhost:4173
+        # Start preview server in background
+        npm run preview > preview.log 2>&1 &
+        
+        # Wait for server to be ready with timeout
+        timeout 60s npx wait-on http://localhost:4173 --timeout 60000 || {
+          echo "Preview server failed to start within 60 seconds"
+          echo "Preview server logs:"
+          cat preview.log
+          exit 1
+        }
+        
+        echo "Preview server is ready at http://localhost:4173"
 
     - name: Run E2E tests
       run: |
         cd web
-        npx playwright test
+        # Run E2E tests with timeout to prevent hanging
+        timeout 10m npx playwright test --timeout=300000
+
+    - name: Stop preview server
+      if: always()
+      run: |
+        cd web
+        # Kill any remaining preview processes
+        pkill -f "npm run preview" 2>/dev/null || true
+        pkill -f "vite preview" 2>/dev/null || true
 
     - name: Upload E2E test results
       uses: actions/upload-artifact@v4
@@ -351,14 +369,14 @@ jobs:
 
     - name: Download Go coverage
       uses: actions/download-artifact@v4
-      continue-on-error: true
+      continue-on-error: true  # Coverage artifacts may not exist if tests failed
       with:
         name: go-coverage
         path: ./go-coverage/
 
     - name: Download frontend coverage
       uses: actions/download-artifact@v4  
-      continue-on-error: true
+      continue-on-error: true  # Coverage artifacts may not exist if tests failed
       with:
         name: frontend-coverage
         path: ./web/coverage/

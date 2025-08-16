@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react'
 import Editor, { OnMount, OnChange } from '@monaco-editor/react'
+import type { editor } from 'monaco-editor'
 import { useTheme } from '@/components/theme-provider'
 import { cn } from '@/lib/utils'
 
@@ -23,7 +24,7 @@ export default function MonacoEditor({
   options = {}
 }: MonacoEditorProps) {
   const { theme } = useTheme()
-  const editorRef = useRef<Editor | null>(null)
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
