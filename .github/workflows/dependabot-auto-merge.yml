@@ -20,16 +20,20 @@ jobs:
       with:
         github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-    - name: Enable auto-merge for Dependabot PRs
-      if: contains(steps.metadata.outputs.dependency-names, 'my-dependency') == false
-      run: gh pr merge --auto --merge "$PR_URL"
+    - name: Auto-approve security updates only
+      if: steps.metadata.outputs.update-type == 'version-update:semver-patch' && contains(steps.metadata.outputs.dependency-names, 'security') == true
+      run: |
+        echo "Auto-approving security update: ${{ steps.metadata.outputs.dependency-names }}"
+        gh pr review --approve "$PR_URL" --body "Auto-approved security update"
       env:
         PR_URL: ${{github.event.pull_request.html_url}}
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-    - name: Auto-approve minor and patch updates
-      if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
-      run: gh pr review --approve "$PR_URL"
+    - name: Enable auto-merge for security updates only
+      if: steps.metadata.outputs.update-type == 'version-update:semver-patch' && contains(steps.metadata.outputs.dependency-names, 'security') == true
+      run: |
+        echo "Auto-merging security update: ${{ steps.metadata.outputs.dependency-names }}"
+        gh pr merge --auto --merge "$PR_URL"
       env:
         PR_URL: ${{github.event.pull_request.html_url}}
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

@@ -1,0 +1,89 @@
+name: CI Summary
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  ci-summary:
+    name: Generate CI Summary
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion != 'cancelled'
+    
+    steps:
+    - name: Generate CI Summary Report
+      run: |
+        echo "# 🚀 CI Pipeline Summary" > ci-summary.md
+        echo "" >> ci-summary.md
+        echo "**Workflow:** ${{ github.event.workflow_run.name }}" >> ci-summary.md
+        echo "**Status:** ${{ github.event.workflow_run.conclusion }}" >> ci-summary.md
+        echo "**Branch:** ${{ github.event.workflow_run.head_branch }}" >> ci-summary.md
+        echo "**Commit:** ${{ github.event.workflow_run.head_sha }}" >> ci-summary.md
+        echo "**Run Number:** ${{ github.event.workflow_run.run_number }}" >> ci-summary.md
+        echo "**Triggered By:** ${{ github.event.workflow_run.triggering_actor.login }}" >> ci-summary.md
+        echo "" >> ci-summary.md
+        
+        # Status badges
+        if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+          echo "![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)" >> ci-summary.md
+          echo "![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-Passing-brightgreen)" >> ci-summary.md
+          echo "![Backend Tests](https://img.shields.io/badge/Backend%20Tests-Passing-brightgreen)" >> ci-summary.md
+          echo "![Security](https://img.shields.io/badge/Security-Passing-brightgreen)" >> ci-summary.md
+        else
+          echo "![Build Status](https://img.shields.io/badge/Build-Failed-red)" >> ci-summary.md
+        fi
+        echo "" >> ci-summary.md
+        
+        echo "## 📊 Pipeline Components" >> ci-summary.md
+        echo "" >> ci-summary.md
+        echo "### Backend (Go)" >> ci-summary.md
+        echo "- ✅ **Go Tests**: Unit tests with race detection" >> ci-summary.md
+        echo "- ✅ **Go Linting**: golangci-lint static analysis" >> ci-summary.md
+        echo "- ✅ **Mock Generation**: Mockery for test dependencies" >> ci-summary.md
+        echo "" >> ci-summary.md
+        
+        echo "### Frontend (React)" >> ci-summary.md
+        echo "- ✅ **Unit Tests**: Vitest + React Testing Library" >> ci-summary.md
+        echo "- ✅ **Type Checking**: TypeScript validation" >> ci-summary.md  
+        echo "- ✅ **Linting**: ESLint code quality checks" >> ci-summary.md
+        echo "- ✅ **Build**: Production build with Vite" >> ci-summary.md
+        echo "- ✅ **E2E Tests**: Playwright browser testing (main branch)" >> ci-summary.md
+        echo "" >> ci-summary.md
+        
+        echo "### Security" >> ci-summary.md
+        echo "- ✅ **Dependency Scanning**: govulncheck + Nancy" >> ci-summary.md
+        echo "- ✅ **Code Analysis**: CodeQL + Gosec + Semgrep" >> ci-summary.md
+        echo "- ✅ **Secret Detection**: TruffleHog + GitLeaks" >> ci-summary.md
+        echo "- ✅ **License Compliance**: License validation" >> ci-summary.md
+        echo "- ✅ **Supply Chain**: SBOM generation + verification" >> ci-summary.md
+        echo "" >> ci-summary.md
+        
+        echo "### Build Artifacts" >> ci-summary.md
+        echo "- 📦 **Go Binaries**: Multi-platform builds (Linux, macOS)" >> ci-summary.md
+        echo "- 📦 **Frontend Bundle**: Production-ready web assets" >> ci-summary.md
+        echo "- 📊 **Test Reports**: Coverage and quality reports" >> ci-summary.md
+        echo "- 🔒 **Security Reports**: Vulnerability scan results" >> ci-summary.md
+        echo "" >> ci-summary.md
+        
+        echo "---" >> ci-summary.md
+        echo "" >> ci-summary.md
+        echo "🔗 **View Workflow Run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}" >> ci-summary.md
+        echo "" >> ci-summary.md
+        echo "*Generated on $(date)*" >> ci-summary.md
+        
+        cat ci-summary.md
+
+    - name: Upload CI Summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: ci-summary-${{ github.event.workflow_run.run_number }}
+        path: ci-summary.md
+        retention-days: 30

@@ -7,6 +7,75 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added - Docker Development & Production Infrastructure
+
+#### Comprehensive Docker Development Environment
+- **Development Docker Compose** (`docker-compose.override.yml`)
+  - Hot reload support for Go backend using Air
+  - Hot reload support for React frontend using Vite
+  - Separate development services: `apiweaver-dev`, `frontend-dev`
+  - Live code mounting with read-only volumes for security
+  - Development tools container for utilities and debugging
+
+- **Development Dockerfile** (`Dockerfile.dev`)
+  - Multi-stage development-optimized build
+  - Go hot reload with Air auto-configuration
+  - Delve debugger integration on port 2345
+  - Node.js development server with Vite
+  - Cache volumes for Go packages and Node modules
+
+#### Production-Ready Docker Infrastructure
+- **Optimized Production Build** (`Dockerfile`)
+  - Enhanced Go build with static compilation and optimizations
+  - Security hardening with non-root users and minimal attack surface
+  - Multi-stage production build for minimal image size
+  - Frontend asset embedding with production optimizations
+
+- **Production Docker Compose** (`docker-compose.prod.yml`)
+  - Auto-scaling support with configurable replicas
+  - Resource limits and reservations for all services
+  - Enhanced MongoDB configuration with performance tuning
+  - Nginx load balancing with SSL/TLS ready configuration
+  - Production monitoring and backup integration
+
+#### Enhanced Service Management
+- **Comprehensive Health Checks**
+  - MongoDB health validation with authentication
+  - APIWeaver service health with database connectivity checks
+  - Frontend development server health monitoring
+  - Service dependency management with restart conditions
+
+- **Advanced Volume Management**
+  - Labeled volumes for backup identification
+  - MongoDB data persistence with bind mounts
+  - Backup storage volume with automated scheduling
+  - Development cache volumes for performance
+
+#### Developer Experience Improvements
+- **Enhanced Makefile** (`Makefile.docker`) - 30+ Docker commands
+  - Development workflow: `docker-dev`, `dev-restart`, `dev-rebuild`
+  - Production management: `docker-prod`, `docker-prod-scale`, `docker-prod-setup`
+  - Debugging utilities: `docker-debug`, `docker-shell`, `docker-health`
+  - Service monitoring: `docker-logs`, `docker-stats`, `dev-status`
+
+- **Environment Templates**
+  - Production environment template (`.env.production`)
+  - Security-focused configuration with prompts
+  - Performance optimization variables
+  - Resource limits and scaling configuration
+
+#### Network & Security Features
+- **Custom Docker Network** with isolated subnet (172.20.0.0/16)
+- **Security Hardening** with `no-new-privileges` and non-root users
+- **Environment-based Configuration** for dev/prod separation
+- **SSL/TLS Support** with Nginx reverse proxy
+
+#### Performance Optimizations
+- **Go Runtime Tuning** (GOMAXPROCS, GOGC, GOMEMLIMIT)
+- **MongoDB Performance** with WiredTiger optimization and connection pooling
+- **Container Resource Management** with limits and reservations
+- **Multi-replica Support** for production scaling
+
 ### Added - Frontend Foundation Implementation (MVP)
 
 #### Core React Frontend Architecture (~37% Feature Complete)
