@@ -45,7 +45,7 @@ RUN npm run build:ci \
 # ===============================
 # Stage 2: Go Build Stage
 # ===============================
-FROM golang:1.24.4-alpine AS go-builder
+FROM golang:1.24.6-alpine AS go-builder
 
 # Install build dependencies and security patches
 RUN apk add --no-cache \
