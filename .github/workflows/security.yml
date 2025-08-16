@@ -536,7 +536,7 @@ jobs:
         fi
 
     - name: Run SLSA verifier
-      uses: slsa-framework/slsa-verifier/actions/installer@v2.5.1
+      uses: slsa-framework/slsa-verifier/actions/installer@v2.7.1
 
     - name: Enhanced supply chain verification
       run: |
