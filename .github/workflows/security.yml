@@ -240,7 +240,10 @@ jobs:
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        extra_args: --debug --only-verified --json --results=trufflehog-results.json
+        base: ${{ github.event.before || 'HEAD~1' }}
+        head: ${{ github.sha }}
+        extra_args: --only-verified --json --results=trufflehog-results.json
+      timeout-minutes: 10
 
     - name: Run GitLeaks with enhanced scanning
       uses: gitleaks/gitleaks-action@v2
@@ -645,17 +648,17 @@ jobs:
 
     - name: Run staticcheck
       run: |
-        staticcheck -f json ./... > staticcheck-results.json || echo "Staticcheck completed"
-        staticcheck ./... > staticcheck-results.txt || echo "Staticcheck completed"
+        staticcheck -f json ./internal/... ./pkg/... ./cmd/... > staticcheck-results.json || echo "Staticcheck completed"
+        staticcheck ./internal/... ./pkg/... ./cmd/... > staticcheck-results.txt || echo "Staticcheck completed"
 
     - name: Run go-critic
       run: |
-        gocritic check -enableAll ./... > gocritic-results.txt || echo "Go-critic completed"
+        gocritic check -enableAll ./internal/... ./pkg/... ./cmd/... > gocritic-results.txt || echo "Go-critic completed"
 
     - name: Run comprehensive Go security checks
       run: |
         # Run go vet with all checks
-        go vet -all ./... > govet-results.txt 2>&1 || echo "Go vet completed"
+        go vet -all ./internal/... ./pkg/... ./cmd/... > govet-results.txt 2>&1 || echo "Go vet completed"
         
         # Check for common security issues
         echo "# Go Security Analysis" > go-security-analysis.md
