@@ -43,10 +43,17 @@ jobs:
     - name: Run Go vulnerability check with enhanced reporting
       run: |
         go install golang.org/x/vuln/cmd/govulncheck@latest
-        # Run with JSON output for better reporting
+        
+        # Check for known security issues in dependencies
+        go list -json -m all > go-deps.json
+        
+        # Run vulnerability check with JSON output for better reporting
         govulncheck -json ./... > govulncheck-results.json || echo "Vulnerabilities found"
         # Also run with standard output for logs
         govulncheck ./...
+        
+        # Check for outdated dependencies
+        go list -u -m all > outdated-deps.txt || true
 
     # Nancy OSS Index scan removed due to repository unavailability
     # - name: Install and run Nancy for dependency scanning
@@ -54,17 +61,6 @@ jobs:
     #     go install github.com/sonatypecommunity/nancy@latest
     #     # Generate list of dependencies
     #     go list -json -deps ./... | nancy sleuth --loud
-
-    - name: Run Go mod audit
-      run: |
-        # Check for known security issues in dependencies
-        go list -json -m all > go-deps.json
-        
-        # Install go-audit for additional dependency scanning
-        go install github.com/elastic/go-sysinfo/cmd/go-sysinfo@latest
-        
-        # Check for outdated dependencies
-        go list -u -m all > outdated-deps.txt || true
 
     - name: Upload vulnerability scan results
       uses: actions/upload-artifact@v4
@@ -209,6 +205,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24.6'
 
     - name: Run Semgrep
       uses: semgrep/semgrep-action@v1
