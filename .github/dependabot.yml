@@ -17,9 +17,8 @@ updates:
       - "dependencies"
       - "go"
     # Only create PRs for security updates
-    ignore:
-      # Ignore all regular version updates, only allow security updates
-      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
+    allow:
+      - dependency-type: "direct"
 
   # Frontend dependencies - Security updates only
   - package-ecosystem: "npm"
@@ -37,9 +36,9 @@ updates:
       - "security"
       - "dependencies"
       - "frontend"
-    ignore:
-      # Ignore all regular version updates, only allow security updates
-      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
+    # Only create PRs for security updates
+    allow:
+      - dependency-type: "direct"
 
   # GitHub Actions - Security updates only
   - package-ecosystem: "github-actions"
@@ -57,9 +56,9 @@ updates:
       - "security"
       - "dependencies"
       - "ci"
-    ignore:
-      # Ignore all regular version updates, only allow security updates
-      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
+    # Only create PRs for security updates
+    allow:
+      - dependency-type: "direct"
 
   # Docker dependencies - Security updates only
   - package-ecosystem: "docker"
@@ -77,6 +76,6 @@ updates:
       - "security"
       - "dependencies"
       - "docker"
-    ignore:
-      # Ignore all regular version updates, only allow security updates
-      - update-types: ["version-update:semver-patch", "version-update:semver-minor", "version-update:semver-major"]
+    # Only create PRs for security updates
+    allow:
+      - dependency-type: "direct"

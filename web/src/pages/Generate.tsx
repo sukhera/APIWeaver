@@ -386,7 +386,7 @@ Create a new task
           rightPanel={
             <div className="h-full flex flex-col">
               <div className="p-4 border-b border-border">
-                <Tabs value={activeOutputTab} onValueChange={(value: string) => setActiveOutputTab(value)}>
+                <Tabs value={activeOutputTab} onValueChange={(value) => setActiveOutputTab(value as 'spec' | 'validation' | 'errors')}>
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="spec" className="text-xs">
                       <Eye className="h-3 w-3 mr-1" />

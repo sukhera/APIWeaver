@@ -71,6 +71,12 @@ build/
 dist/
 out/
 
+# Frontend specific exclusions
+web/dist/
+web/coverage/
+web/.vite/
+web/test-results/
+
 # Go build artifacts
 *.exe
 *.exe~

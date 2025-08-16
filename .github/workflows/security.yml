@@ -735,11 +735,25 @@ jobs:
   container-security:
     name: Container Security Analysis
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('Dockerfile') != '' }}
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Check for Dockerfile
+      id: check-dockerfile
+      run: |
+        if [ -f Dockerfile ]; then
+          echo "dockerfile-exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "dockerfile-exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create empty files if no Dockerfile
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'false'
+      run: |
+        echo "No Dockerfile found" > dockerfile-lint.txt
+        echo "No Docker image to scan" > trivy-image-results.txt
 
     - name: Install container security tools
       run: |
@@ -755,20 +769,14 @@ jobs:
         git clone https://github.com/docker/docker-bench-security.git
 
     - name: Lint Dockerfile with Hadolint
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       run: |
-        if [ -f Dockerfile ]; then
-          hadolint Dockerfile > dockerfile-lint.txt || echo "Hadolint completed"
-        else
-          echo "No Dockerfile found" > dockerfile-lint.txt
-        fi
+        hadolint Dockerfile > dockerfile-lint.txt || echo "Hadolint completed"
 
     - name: Build Docker image for security scanning
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       run: |
-        if [ -f Dockerfile ]; then
-          docker build -t apiweaver-security-scan:latest .
-        else
-          echo "No Dockerfile found, skipping image build"
-        fi
+        docker build -t apiweaver-security-scan:latest .
 
     - name: Run Trivy filesystem scan
       run: |
@@ -776,6 +784,7 @@ jobs:
         trivy fs --security-checks vuln,config,secret --format table --output trivy-fs-results.txt .
 
     - name: Run Trivy image scan
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       run: |
         if docker image inspect apiweaver-security-scan:latest >/dev/null 2>&1; then
           trivy image --format json --output trivy-image-results.json apiweaver-security-scan:latest
@@ -800,7 +809,6 @@ jobs:
     name: Comprehensive Security Report
     runs-on: ubuntu-latest
     needs: [dependency-scan, codeql-analysis, gosec-scan, semgrep-scan, secret-scan, license-scan, advanced-sast, supply-chain-security]
-    if: always()
     
     steps:
     - name: Generate comprehensive security report

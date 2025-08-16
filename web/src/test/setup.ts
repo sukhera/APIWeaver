@@ -68,10 +68,10 @@ global.FileReader = class FileReader {
   result: string | ArrayBuffer | null = null
   error: DOMException | null = null
   readyState: number = 0
-  EMPTY = 0
-  LOADING = 1
-  DONE = 2
-} as typeof FileReader
+  static readonly EMPTY = 0
+  static readonly LOADING = 1
+  static readonly DONE = 2
+} as unknown as typeof FileReader
 
 // Mock Monaco Editor
 vi.mock('@monaco-editor/react', () => ({
@@ -87,9 +87,9 @@ vi.mock('@monaco-editor/react', () => ({
 // Mock react-resizable-panels
 vi.mock('react-resizable-panels', () => ({
   PanelGroup: ({ children, ...props }: Record<string, unknown>) => 
-    React.createElement('div', { 'data-testid': 'resizable-panel-group', ...props }, children),
+    React.createElement('div', { 'data-testid': 'resizable-panel-group', ...props }, children as React.ReactNode),
   Panel: ({ children, ...props }: Record<string, unknown>) => 
-    React.createElement('div', { 'data-testid': 'resizable-panel', ...props }, children),
+    React.createElement('div', { 'data-testid': 'resizable-panel', ...props }, children as React.ReactNode),
   PanelResizeHandle: (props: Record<string, unknown>) => 
     React.createElement('div', { 'data-testid': 'resizable-handle', ...props }),
 }))

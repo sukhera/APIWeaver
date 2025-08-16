@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
       retry: (failureCount, error: unknown) => {
         // Don't retry on 4xx errors
         const apiError = error as { status?: number }
-        if (apiError?.status >= 400 && apiError?.status < 500) {
+        if (apiError?.status && apiError.status >= 400 && apiError.status < 500) {
           return false
         }
         return failureCount < 3
@@ -36,7 +36,7 @@ const queryClient = new QueryClient({
       retry: (failureCount, error: unknown) => {
         // Don't retry mutations on client errors
         const apiError = error as { status?: number }
-        if (apiError?.status >= 400 && apiError?.status < 500) {
+        if (apiError?.status && apiError.status >= 400 && apiError.status < 500) {
           return false
         }
         return failureCount < 2
