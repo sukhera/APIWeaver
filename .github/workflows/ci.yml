@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GO_VERSION: '1.24.4'  # Sync with go.mod version
+  GO_VERSION: '1.24.4'  # Latest stable Go version
   CGO_ENABLED: 0
 
 jobs:
@@ -153,7 +153,7 @@ jobs:
     - name: Install golangci-lint
       uses: golangci/golangci-lint-action@v7
       with:
-        version: v2.3.1
+        version: latest
         args: --timeout=5m
 
   frontend-test:
@@ -222,7 +222,7 @@ jobs:
     - name: Check for unused dependencies
       run: |
         cd web
-        npx depcheck --ignores="@types/*,@typescript-eslint/*,@vitejs/*,@testing-library/*,tailwindcss*,postcss*,autoprefixer,prettier*,@vitest/coverage-v8"
+        npx depcheck --ignores="@types/*,@typescript-eslint/*,@vitejs/*,@testing-library/*,tailwindcss*,postcss*,autoprefixer,prettier*,@vitest/coverage-v8,wait-on"
 
   frontend-build:
     name: Frontend Build
