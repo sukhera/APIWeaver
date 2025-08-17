@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { CheckCircle, AlertCircle, FileText, Upload, Download, Copy } from 'lucide-react'
+import { CheckCircle, AlertCircle, FileText, Download, Copy } from 'lucide-react'
 
 // Components
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout'
@@ -15,7 +15,7 @@ import FileUpload from '@/components/common/FileUpload'
 // Hooks and Store
 import { useValidateMutation, useRealtimeValidation } from '@/hooks/useApiQueries'
 import { useAppStore } from '@/store/useAppStore'
-import type { ValidationError, ValidationSummary } from '@/types/api'
+import type { ValidateResponse, ValidationError, ValidationSummary } from '@/types/api'
 
 export default function Validate() {
   const { 
@@ -110,9 +110,7 @@ export default function Validate() {
   const isValidating = validateMutation.isPending || 
     (realtimeValidation && realtimeQuery.isFetching)
 
-  const hasErrors = validationResult && !validationResult.valid
   const errorCount = validationResult?.errors?.length || 0
-  const warningCount = validationResult?.warnings?.length || 0
 
   // Left Panel - Input
   const leftPanel = (
@@ -305,7 +303,7 @@ export default function Validate() {
 
 // Validation Results Component
 interface ValidationResultsProps {
-  result?: any
+  result?: ValidateResponse
   isLoading: boolean
   activeTab: 'results' | 'summary' | 'errors'
   onErrorClick: (error: ValidationError) => void
@@ -353,7 +351,7 @@ function ValidationResults({ result, isLoading, activeTab, onErrorClick }: Valid
 }
 
 // Validation Overview Component
-function ValidationOverview({ result }: { result: any }) {
+function ValidationOverview({ result }: { result: ValidateResponse }) {
   const errorCount = result.errors?.length || 0
   const warningCount = result.warnings?.length || 0
 

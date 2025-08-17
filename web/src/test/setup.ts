@@ -91,8 +91,8 @@ global.FileReader = class FileReader {
     }, 0)
   }
   
-  onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null = null
-  onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null = null
+  onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null
+  onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null
 } as unknown as typeof FileReader
 
 // Mock Monaco Editor

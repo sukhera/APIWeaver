@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react'
 import Editor, { OnMount, OnChange } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import { useTheme } from '@/components/theme-provider'
+import { useTheme } from '@/hooks/useTheme'
 import { cn } from '@/lib/utils'
 
 interface MonacoEditorProps {

@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { GitMerge, FileText, Upload, Download, Copy, Eye, Play, RotateCcw } from 'lucide-react'
+import { GitMerge, FileText, Download, Copy, Eye, Play, RotateCcw } from 'lucide-react'
 
 // Components
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout'
