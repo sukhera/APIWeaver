@@ -39,20 +39,20 @@ func NewHTTPError(code int, message string, details ...string) HTTPError {
 
 // Common HTTP errors
 var (
-	ErrBadRequest          = NewHTTPError(http.StatusBadRequest, "Bad Request")
-	ErrUnauthorized        = NewHTTPError(http.StatusUnauthorized, "Unauthorized")
-	ErrForbidden           = NewHTTPError(http.StatusForbidden, "Forbidden")
-	ErrNotFound            = NewHTTPError(http.StatusNotFound, "Not Found")
-	ErrMethodNotAllowed    = NewHTTPError(http.StatusMethodNotAllowed, "Method Not Allowed")
-	ErrRequestTimeout      = NewHTTPError(http.StatusRequestTimeout, "Request Timeout")
-	ErrPayloadTooLarge     = NewHTTPError(http.StatusRequestEntityTooLarge, "Payload Too Large")
+	ErrBadRequest           = NewHTTPError(http.StatusBadRequest, "Bad Request")
+	ErrUnauthorized         = NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	ErrForbidden            = NewHTTPError(http.StatusForbidden, "Forbidden")
+	ErrNotFound             = NewHTTPError(http.StatusNotFound, "Not Found")
+	ErrMethodNotAllowed     = NewHTTPError(http.StatusMethodNotAllowed, "Method Not Allowed")
+	ErrRequestTimeout       = NewHTTPError(http.StatusRequestTimeout, "Request Timeout")
+	ErrPayloadTooLarge      = NewHTTPError(http.StatusRequestEntityTooLarge, "Payload Too Large")
 	ErrUnsupportedMediaType = NewHTTPError(http.StatusUnsupportedMediaType, "Unsupported Media Type")
-	ErrTooManyRequests     = NewHTTPError(http.StatusTooManyRequests, "Too Many Requests")
-	ErrInternalServer      = NewHTTPError(http.StatusInternalServerError, "Internal Server Error")
-	ErrNotImplemented      = NewHTTPError(http.StatusNotImplemented, "Not Implemented")
-	ErrBadGateway          = NewHTTPError(http.StatusBadGateway, "Bad Gateway")
-	ErrServiceUnavailable  = NewHTTPError(http.StatusServiceUnavailable, "Service Unavailable")
-	ErrGatewayTimeout      = NewHTTPError(http.StatusGatewayTimeout, "Gateway Timeout")
+	ErrTooManyRequests      = NewHTTPError(http.StatusTooManyRequests, "Too Many Requests")
+	ErrInternalServer       = NewHTTPError(http.StatusInternalServerError, "Internal Server Error")
+	ErrNotImplemented       = NewHTTPError(http.StatusNotImplemented, "Not Implemented")
+	ErrBadGateway           = NewHTTPError(http.StatusBadGateway, "Bad Gateway")
+	ErrServiceUnavailable   = NewHTTPError(http.StatusServiceUnavailable, "Service Unavailable")
+	ErrGatewayTimeout       = NewHTTPError(http.StatusGatewayTimeout, "Gateway Timeout")
 )
 
 // GetClientIP extracts the client IP address from the request
@@ -85,12 +85,12 @@ func GetUserAgent(r *http.Request) string {
 	if ua == "" {
 		return "Unknown"
 	}
-	
+
 	// Truncate very long user agents
 	if len(ua) > 500 {
 		ua = ua[:500] + "..."
 	}
-	
+
 	return ua
 }
 
@@ -156,15 +156,15 @@ func SetCORSHeaders(w http.ResponseWriter, allowedOrigins []string, allowedMetho
 		// In a real implementation, you'd check the Origin header against allowedOrigins
 		w.Header().Set("Access-Control-Allow-Origin", strings.Join(allowedOrigins, ","))
 	}
-	
+
 	if len(allowedMethods) > 0 {
 		w.Header().Set("Access-Control-Allow-Methods", strings.Join(allowedMethods, ", "))
 	}
-	
+
 	if len(allowedHeaders) > 0 {
 		w.Header().Set("Access-Control-Allow-Headers", strings.Join(allowedHeaders, ", "))
 	}
-	
+
 	w.Header().Set("Access-Control-Max-Age", "86400")
 }
 
@@ -173,17 +173,17 @@ func ParseRange(rangeHeader string, size int64) (start, end int64, err error) {
 	if !strings.HasPrefix(rangeHeader, "bytes=") {
 		return 0, 0, fmt.Errorf("invalid range header")
 	}
-	
+
 	rangeSpec := rangeHeader[6:] // Remove "bytes="
 	parts := strings.Split(rangeSpec, "-")
 	if len(parts) != 2 {
 		return 0, 0, fmt.Errorf("invalid range format")
 	}
-	
+
 	if parts[0] == "" && parts[1] == "" {
 		return 0, 0, fmt.Errorf("invalid range values")
 	}
-	
+
 	if parts[0] == "" {
 		// Suffix range (-500)
 		suffix, err := strconv.ParseInt(parts[1], 10, 64)
@@ -210,12 +210,12 @@ func ParseRange(rangeHeader string, size int64) (start, end int64, err error) {
 			return 0, 0, err
 		}
 	}
-	
+
 	// Validate range
 	if start < 0 || end >= size || start > end {
 		return 0, 0, fmt.Errorf("invalid range values")
 	}
-	
+
 	return start, end, nil
 }
 

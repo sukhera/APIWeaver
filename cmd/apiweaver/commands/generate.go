@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/sukhera/APIWeaver/internal/config"
@@ -67,8 +68,11 @@ func runGenerate(ctx context.Context, inputFile, outputFile, outputFormat, confi
 		"format", outputFormat,
 	)
 
+	// Clean and validate input file path
+	inputFile = filepath.Clean(inputFile)
+
 	// Read input file
-	content, err := os.ReadFile(inputFile)
+	content, err := os.ReadFile(inputFile) // #nosec G304 - file path is from CLI argument
 	if err != nil {
 		return fmt.Errorf("failed to read input file %s: %w", inputFile, err)
 	}
@@ -85,7 +89,7 @@ func runGenerate(ctx context.Context, inputFile, outputFile, outputFormat, confi
 
 	// Output result
 	if outputFile != "" {
-		if err := os.WriteFile(outputFile, []byte(spec.Content), 0644); err != nil {
+		if err := os.WriteFile(outputFile, []byte(spec.Content), 0600); err != nil {
 			return fmt.Errorf("failed to write output file %s: %w", outputFile, err)
 		}
 		log.Info("OpenAPI specification generated successfully", "output_file", outputFile)

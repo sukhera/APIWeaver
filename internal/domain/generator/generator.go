@@ -92,9 +92,9 @@ paths:`
       summary: %s
       responses:
         '200':
-          description: Success`, 
-				endpoint.Path, 
-				endpoint.Method, 
+          description: Success`,
+				endpoint.Path,
+				endpoint.Method,
 				getEndpointSummary(endpoint))
 		}
 	}

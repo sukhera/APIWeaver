@@ -39,13 +39,13 @@ func NewRouter(cfg *config.ExtendedConfig, logger *slog.Logger, store storage.St
 // Handler returns the HTTP handler with middleware applied
 func (r *Router) Handler() http.Handler {
 	handler := http.Handler(r.mux)
-	
+
 	// Apply middleware stack (in reverse order - last applied executes first)
 	handler = middleware.Recovery(r.logger)(handler)
 	handler = middleware.Logging(r.logger)(handler)
 	handler = middleware.CORS(r.config.Server.CORS)(handler)
 	handler = middleware.Security()(handler)
-	
+
 	return handler
 }
 

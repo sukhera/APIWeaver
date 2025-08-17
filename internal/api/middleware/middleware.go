@@ -105,14 +105,14 @@ func RequestID() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Generate request ID (simplified)
 			requestID := fmt.Sprintf("%d", time.Now().UnixNano())
-			
+
 			// Add to response headers
 			w.Header().Set("X-Request-ID", requestID)
-			
+
 			// Add to request context for logging
 			ctx := r.Context()
 			// In a real implementation, you'd add the request ID to context
-			
+
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

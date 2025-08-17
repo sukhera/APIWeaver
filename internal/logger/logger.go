@@ -63,7 +63,7 @@ func New(cfg Config) (*slog.Logger, error) {
 		writer = os.Stderr
 	default:
 		// Assume it's a file path
-		file, err := os.OpenFile(cfg.Output, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		file, err := os.OpenFile(cfg.Output, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 		if err != nil {
 			return nil, err
 		}

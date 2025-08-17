@@ -61,7 +61,7 @@ func runServe(ctx context.Context, port int, host, configFile string, verbose, d
 	// Load configuration with fallback to defaults
 	var cfg *config.ExtendedConfig
 	var err error
-	
+
 	if configFile != "" {
 		cfg, err = config.Load(configFile)
 		if err != nil {
@@ -126,7 +126,11 @@ func runServe(ctx context.Context, port int, host, configFile string, verbose, d
 		if err != nil {
 			log.Warn("Failed to initialize MongoDB storage, continuing without persistence", "error", err)
 		} else {
-			defer store.Close()
+			defer func() {
+				if err := store.Close(); err != nil {
+					log.Error("Failed to close storage", "error", err)
+				}
+			}()
 		}
 	}
 

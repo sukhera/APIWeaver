@@ -34,8 +34,8 @@ type SecurityConfig struct {
 
 // RateLimitConfig holds rate limiting configuration
 type RateLimitConfig struct {
-	Enabled     bool `mapstructure:"enabled" json:"enabled"`
-	RequestsPerMinute int `mapstructure:"requests_per_minute" json:"requests_per_minute"`
+	Enabled           bool `mapstructure:"enabled" json:"enabled"`
+	RequestsPerMinute int  `mapstructure:"requests_per_minute" json:"requests_per_minute"`
 }
 
 // StorageConfig holds storage configuration
@@ -46,18 +46,18 @@ type StorageConfig struct {
 
 // MongoDBConfig holds MongoDB configuration
 type MongoDBConfig struct {
-	Enabled    bool   `mapstructure:"enabled" json:"enabled"`
-	URI        string `mapstructure:"uri" json:"uri"`
-	Database   string `mapstructure:"database" json:"database"`
-	MaxPoolSize int   `mapstructure:"max_pool_size" json:"max_pool_size"`
-	Timeout    int    `mapstructure:"timeout" json:"timeout"` // seconds
+	Enabled     bool   `mapstructure:"enabled" json:"enabled"`
+	URI         string `mapstructure:"uri" json:"uri"`
+	Database    string `mapstructure:"database" json:"database"`
+	MaxPoolSize int    `mapstructure:"max_pool_size" json:"max_pool_size"`
+	Timeout     int    `mapstructure:"timeout" json:"timeout"` // seconds
 }
 
 // CacheConfig holds cache configuration
 type CacheConfig struct {
-	Enabled     bool `mapstructure:"enabled" json:"enabled"`
-	MaxSize     int  `mapstructure:"max_size" json:"max_size"`
-	TTLSeconds  int  `mapstructure:"ttl_seconds" json:"ttl_seconds"`
+	Enabled    bool `mapstructure:"enabled" json:"enabled"`
+	MaxSize    int  `mapstructure:"max_size" json:"max_size"`
+	TTLSeconds int  `mapstructure:"ttl_seconds" json:"ttl_seconds"`
 }
 
 // ExtendedConfig extends the base Config with additional fields
@@ -102,11 +102,11 @@ func Load(configFile string) (*ExtendedConfig, error) {
 
 	// Initialize the base config first
 	baseConfig := Default()
-	
-	// Unmarshal to struct  
+
+	// Unmarshal to struct
 	var cfg ExtendedConfig
 	cfg.Config = baseConfig
-	
+
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
@@ -193,7 +193,7 @@ func (c *ExtendedConfig) Save(filename string) error {
 
 	// Ensure directory exists
 	dir := filepath.Dir(filename)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 

@@ -187,7 +187,7 @@ func (h *Handlers) Validate(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) Examples(w http.ResponseWriter, r *http.Request) {
 	// Get examples from storage if available
 	var examples []models.ExampleTemplate
-	
+
 	if h.storage != nil {
 		storageExamples, err := h.storage.ListExamples(r.Context(), storage.ExampleFilters{})
 		if err != nil {
@@ -248,7 +248,7 @@ func (h *Handlers) StaticFiles(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) writeJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	
+
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		h.logger.Error("Failed to encode JSON response", "error", err)
 	}
@@ -264,6 +264,6 @@ func (h *Handlers) writeErrorResponse(w http.ResponseWriter, statusCode int, mes
 		},
 		Timestamp: time.Now(),
 	}
-	
+
 	h.writeJSONResponse(w, statusCode, response)
 }

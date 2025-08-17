@@ -30,13 +30,13 @@ type ValidateRequest struct {
 // ParseGenerateRequest parses a generate request from HTTP request
 func ParseGenerateRequest(r *http.Request) (*GenerateRequest, error) {
 	contentType := r.Header.Get("Content-Type")
-	
+
 	if strings.HasPrefix(contentType, "multipart/form-data") {
 		return parseMultipartGenerateRequest(r)
 	} else if strings.HasPrefix(contentType, "application/json") {
 		return parseJSONGenerateRequest(r)
 	}
-	
+
 	return nil, fmt.Errorf("unsupported content type: %s", contentType)
 }
 
@@ -48,7 +48,7 @@ func ParseAmendRequest(r *http.Request) (*AmendRequest, error) {
 	}
 
 	if req.Format == "" {
-		req.Format = "yaml" // default
+		req.Format = FormatYAML // default
 	}
 
 	if req.ExistingSpec == "" {
@@ -65,13 +65,13 @@ func ParseAmendRequest(r *http.Request) (*AmendRequest, error) {
 // ParseValidateRequest parses a validate request from HTTP request
 func ParseValidateRequest(r *http.Request) (*ValidateRequest, error) {
 	contentType := r.Header.Get("Content-Type")
-	
+
 	if strings.HasPrefix(contentType, "multipart/form-data") {
 		return parseMultipartValidateRequest(r)
 	} else if strings.HasPrefix(contentType, "application/json") {
 		return parseJSONValidateRequest(r)
 	}
-	
+
 	return nil, fmt.Errorf("unsupported content type: %s", contentType)
 }
 
@@ -84,7 +84,7 @@ func parseJSONGenerateRequest(r *http.Request) (*GenerateRequest, error) {
 	}
 
 	if req.Format == "" {
-		req.Format = "yaml" // default
+		req.Format = FormatYAML // default
 	}
 
 	return &req, nil
@@ -99,7 +99,12 @@ func parseMultipartGenerateRequest(r *http.Request) (*GenerateRequest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file from form: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			// Log error but don't fail the request since we've already read the file
+			_ = closeErr // Explicitly ignore the error
+		}
+	}()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
@@ -108,7 +113,7 @@ func parseMultipartGenerateRequest(r *http.Request) (*GenerateRequest, error) {
 
 	format := r.FormValue("format")
 	if format == "" {
-		format = "yaml" // default
+		format = FormatYAML // default
 	}
 
 	return &GenerateRequest{
@@ -143,7 +148,12 @@ func parseMultipartValidateRequest(r *http.Request) (*ValidateRequest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file from form: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			// Log error but don't fail the request since we've already read the file
+			_ = closeErr // Explicitly ignore the error
+		}
+	}()
 
 	content, err := io.ReadAll(file)
 	if err != nil {

@@ -57,9 +57,9 @@ type GenerateResponse struct {
 }
 
 type GenerateData struct {
-	OpenAPI  string                        `json:"openapi"`
-	Format   string                        `json:"format"`
-	Metadata services.GenerationMetadata   `json:"metadata"`
+	OpenAPI  string                      `json:"openapi"`
+	Format   string                      `json:"format"`
+	Metadata services.GenerationMetadata `json:"metadata"`
 }
 
 // Amend response
@@ -72,11 +72,11 @@ type AmendResponse struct {
 }
 
 type AmendData struct {
-	OpenAPI   string                      `json:"openapi"`
-	Format    string                      `json:"format"`
-	Changes   []string                    `json:"changes"`
-	Conflicts []string                    `json:"conflicts,omitempty"`
-	Metadata  services.AmendmentMetadata  `json:"metadata"`
+	OpenAPI   string                     `json:"openapi"`
+	Format    string                     `json:"format"`
+	Changes   []string                   `json:"changes"`
+	Conflicts []string                   `json:"conflicts,omitempty"`
+	Metadata  services.AmendmentMetadata `json:"metadata"`
 }
 
 // Validate response

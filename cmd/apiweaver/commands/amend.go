@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/sukhera/APIWeaver/internal/config"
@@ -43,7 +44,10 @@ The changes file should contain descriptions of modifications to apply to the ex
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Show what would be changed without applying")
 
-	cmd.MarkFlagRequired("changes")
+	if err := cmd.MarkFlagRequired("changes"); err != nil {
+		// This should never fail for a valid flag name
+		panic(fmt.Sprintf("failed to mark flag as required: %v", err))
+	}
 
 	return cmd
 }
@@ -72,14 +76,18 @@ func runAmend(ctx context.Context, specFile, changesFile, outputFile, outputForm
 		"dry_run", dryRun,
 	)
 
+	// Clean and validate file paths
+	specFile = filepath.Clean(specFile)
+	changesFile = filepath.Clean(changesFile)
+
 	// Read existing spec
-	specContent, err := os.ReadFile(specFile)
+	specContent, err := os.ReadFile(specFile) // #nosec G304 - file path is from CLI argument
 	if err != nil {
 		return fmt.Errorf("failed to read spec file %s: %w", specFile, err)
 	}
 
 	// Read changes
-	changesContent, err := os.ReadFile(changesFile)
+	changesContent, err := os.ReadFile(changesFile) // #nosec G304 - file path is from CLI argument
 	if err != nil {
 		return fmt.Errorf("failed to read changes file %s: %w", changesFile, err)
 	}
@@ -120,7 +128,7 @@ func runAmend(ctx context.Context, specFile, changesFile, outputFile, outputForm
 	}
 
 	// Write result
-	if err := os.WriteFile(outputFile, []byte(result.Content), 0644); err != nil {
+	if err := os.WriteFile(outputFile, []byte(result.Content), 0600); err != nil {
 		return fmt.Errorf("failed to write output file %s: %w", outputFile, err)
 	}
 

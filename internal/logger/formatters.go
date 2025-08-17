@@ -123,12 +123,12 @@ func SanitizeUserInput(input string) string {
 	input = strings.ReplaceAll(input, "\n", "\\n")
 	input = strings.ReplaceAll(input, "\r", "\\r")
 	input = strings.ReplaceAll(input, "\t", "\\t")
-	
+
 	// Limit length to prevent log flooding
 	if len(input) > 1000 {
 		input = input[:1000] + "...[truncated]"
 	}
-	
+
 	return input
 }
 
@@ -137,10 +137,10 @@ func FormatError(err error, operation string, metadata map[string]interface{}) s
 	var parts []string
 	parts = append(parts, fmt.Sprintf("operation=%s", operation))
 	parts = append(parts, fmt.Sprintf("error=%s", err.Error()))
-	
+
 	for key, value := range metadata {
 		parts = append(parts, fmt.Sprintf("%s=%v", key, value))
 	}
-	
+
 	return strings.Join(parts, " ")
 }

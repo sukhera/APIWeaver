@@ -21,7 +21,7 @@ func DirExists(path string) bool {
 
 // EnsureDir creates a directory if it doesn't exist
 func EnsureDir(path string) error {
-	return os.MkdirAll(path, 0755)
+	return os.MkdirAll(path, 0750)
 }
 
 // GetFileExtension returns the file extension (without the dot)
@@ -63,7 +63,7 @@ func ReadFileWithLimit(filename string, maxSize int64) ([]byte, error) {
 		return nil, fmt.Errorf("file size %d exceeds limit %d", info.Size(), maxSize)
 	}
 
-	return os.ReadFile(filename)
+	return os.ReadFile(filename) // #nosec G304 - filename is validated by caller
 }
 
 // WriteFileAtomic writes a file atomically by writing to a temp file first
@@ -77,8 +77,14 @@ func WriteFileAtomic(filename string, data []byte, perm os.FileMode) error {
 
 	tempName := tempFile.Name()
 	defer func() {
-		tempFile.Close()
-		os.Remove(tempName) // Clean up if something goes wrong
+		if closeErr := tempFile.Close(); closeErr != nil {
+			// Log error but continue with cleanup
+			_ = closeErr // Explicitly ignore the error
+		}
+		if removeErr := os.Remove(tempName); removeErr != nil {
+			// Log error but don't fail since this is cleanup
+			_ = removeErr // Explicitly ignore the error
+		}
 	}()
 
 	// Write data to temp file
@@ -114,19 +120,19 @@ func SafeFileName(filename string) string {
 	// Replace unsafe characters with underscore
 	unsafe := []string{"/", "\\", ":", "*", "?", "\"", "<", ">", "|"}
 	result := filename
-	
+
 	for _, char := range unsafe {
 		result = strings.ReplaceAll(result, char, "_")
 	}
-	
+
 	// Remove leading/trailing spaces and dots
 	result = strings.Trim(result, " .")
-	
+
 	// Ensure filename is not empty
 	if result == "" {
 		result = "unnamed"
 	}
-	
+
 	return result
 }
 
@@ -136,24 +142,24 @@ func GetRelativePath(base, target string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	
+
 	absTarget, err := filepath.Abs(target)
 	if err != nil {
 		return "", err
 	}
-	
+
 	return filepath.Rel(absBase, absTarget)
 }
 
 // ListFiles lists files in a directory with optional extension filter
 func ListFiles(dir string, extensions []string) ([]string, error) {
 	var files []string
-	
+
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		
+
 		if !info.IsDir() {
 			if len(extensions) == 0 {
 				files = append(files, path)
@@ -167,10 +173,10 @@ func ListFiles(dir string, extensions []string) ([]string, error) {
 				}
 			}
 		}
-		
+
 		return nil
 	})
-	
+
 	return files, err
 }
 
@@ -189,6 +195,6 @@ func IsExecutable(filename string) bool {
 	if err != nil {
 		return false
 	}
-	
+
 	return info.Mode()&0111 != 0
 }

@@ -297,3 +297,6 @@ test-data/*.backup
 *.pprof
 *.trace
 
+data/
+apiweaver
+logs/

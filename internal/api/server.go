@@ -36,7 +36,7 @@ func NewServer(cfg *config.ExtendedConfig, logger *slog.Logger, store storage.St
 // Start starts the HTTP server
 func (s *Server) Start(ctx context.Context) error {
 	addr := fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port)
-	
+
 	s.server = &http.Server{
 		Addr:         addr,
 		Handler:      s.router.Handler(),
@@ -71,7 +71,7 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	}
 
 	s.logger.Info("Shutting down HTTP server")
-	
+
 	// Set a timeout for graceful shutdown
 	shutdownCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()

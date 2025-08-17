@@ -13,11 +13,11 @@ import (
 
 // GenerationResult represents the result of OpenAPI generation
 type GenerationResult struct {
-	Content  string              `json:"content"`
-	Format   string              `json:"format"`
-	Metadata GenerationMetadata  `json:"metadata"`
-	Warnings []string            `json:"warnings,omitempty"`
-	Errors   []string            `json:"errors,omitempty"`
+	Content  string             `json:"content"`
+	Format   string             `json:"format"`
+	Metadata GenerationMetadata `json:"metadata"`
+	Warnings []string           `json:"warnings,omitempty"`
+	Errors   []string           `json:"errors,omitempty"`
 }
 
 // GenerationMetadata contains metadata about the generation process
@@ -53,11 +53,11 @@ func NewGenerator(cfg *config.ExtendedConfig, logger *slog.Logger) *Generator {
 
 	// Create generator
 	generatorInstance := generator.New(generator.Config{
-		Format:           cfg.OutputFormat,
-		PrettyPrint:      cfg.PrettyPrint,
-		IncludeExamples:  true,
-		ValidateOutput:   true,
-		StrictMode:       cfg.StrictMode,
+		Format:          cfg.OutputFormat,
+		PrettyPrint:     cfg.PrettyPrint,
+		IncludeExamples: true,
+		ValidateOutput:  true,
+		StrictMode:      cfg.StrictMode,
 	})
 
 	return &Generator{
@@ -71,7 +71,7 @@ func NewGenerator(cfg *config.ExtendedConfig, logger *slog.Logger) *Generator {
 // Generate generates an OpenAPI specification from Markdown content
 func (g *Generator) Generate(ctx context.Context, content string, format string) (*GenerationResult, error) {
 	startTime := time.Now()
-	
+
 	g.logger.InfoContext(ctx, "Starting OpenAPI generation",
 		"input_size", len(content),
 		"format", format,
@@ -87,7 +87,7 @@ func (g *Generator) Generate(ctx context.Context, content string, format string)
 	// Check for parse errors
 	var parseErrors []string
 	var parseWarnings []string
-	
+
 	for _, parseErr := range doc.Errors {
 		if parseErr.IsError() {
 			parseErrors = append(parseErrors, parseErr.Error())
@@ -119,7 +119,7 @@ func (g *Generator) Generate(ctx context.Context, content string, format string)
 	}
 
 	processingTime := time.Since(startTime)
-	
+
 	result := &GenerationResult{
 		Content:  spec,
 		Format:   format,
@@ -149,7 +149,7 @@ func (g *Generator) Generate(ctx context.Context, content string, format string)
 // GenerateFromFile generates an OpenAPI specification from a Markdown file
 func (g *Generator) GenerateFromFile(ctx context.Context, filename string, format string) (*GenerationResult, error) {
 	g.logger.InfoContext(ctx, "Generating from file", "filename", filename)
-	
+
 	// This would read the file and call Generate
 	// Implementation would use the file utilities from common package
 	return nil, fmt.Errorf("not implemented")

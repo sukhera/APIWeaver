@@ -30,29 +30,29 @@ type Storage interface {
 
 // Spec represents a stored OpenAPI specification
 type Spec struct {
-	ID          string            `json:"id" bson:"_id"`
-	Title       string            `json:"title" bson:"title"`
-	Version     string            `json:"version" bson:"version"`
-	Content     string            `json:"content" bson:"content"`
-	Format      string            `json:"format" bson:"format"` // yaml, json
-	Metadata    map[string]string `json:"metadata" bson:"metadata"`
-	CreatedAt   time.Time         `json:"created_at" bson:"created_at"`
-	UpdatedAt   time.Time         `json:"updated_at" bson:"updated_at"`
+	ID        string            `json:"id" bson:"_id"`
+	Title     string            `json:"title" bson:"title"`
+	Version   string            `json:"version" bson:"version"`
+	Content   string            `json:"content" bson:"content"`
+	Format    string            `json:"format" bson:"format"` // yaml, json
+	Metadata  map[string]string `json:"metadata" bson:"metadata"`
+	CreatedAt time.Time         `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time         `json:"updated_at" bson:"updated_at"`
 }
 
 // Conversion represents a conversion history record
 type Conversion struct {
-	ID              string            `json:"id" bson:"_id"`
-	InputContent    string            `json:"input_content" bson:"input_content"`
-	OutputContent   string            `json:"output_content" bson:"output_content"`
-	InputFormat     string            `json:"input_format" bson:"input_format"`   // markdown
-	OutputFormat    string            `json:"output_format" bson:"output_format"` // yaml, json
-	ProcessingTime  int               `json:"processing_time" bson:"processing_time"` // milliseconds
-	Success         bool              `json:"success" bson:"success"`
-	Errors          []string          `json:"errors" bson:"errors"`
-	Warnings        []string          `json:"warnings" bson:"warnings"`
-	Metadata        map[string]string `json:"metadata" bson:"metadata"`
-	CreatedAt       time.Time         `json:"created_at" bson:"created_at"`
+	ID             string            `json:"id" bson:"_id"`
+	InputContent   string            `json:"input_content" bson:"input_content"`
+	OutputContent  string            `json:"output_content" bson:"output_content"`
+	InputFormat    string            `json:"input_format" bson:"input_format"`       // markdown
+	OutputFormat   string            `json:"output_format" bson:"output_format"`     // yaml, json
+	ProcessingTime int               `json:"processing_time" bson:"processing_time"` // milliseconds
+	Success        bool              `json:"success" bson:"success"`
+	Errors         []string          `json:"errors" bson:"errors"`
+	Warnings       []string          `json:"warnings" bson:"warnings"`
+	Metadata       map[string]string `json:"metadata" bson:"metadata"`
+	CreatedAt      time.Time         `json:"created_at" bson:"created_at"`
 }
 
 // Example represents a template example
@@ -81,14 +81,14 @@ type SpecFilters struct {
 
 // ConversionFilters defines filters for conversion queries
 type ConversionFilters struct {
-	Success    *bool
-	Format     string
-	DateFrom   *time.Time
-	DateTo     *time.Time
-	Limit      int
-	Offset     int
-	SortBy     string
-	SortDesc   bool
+	Success  *bool
+	Format   string
+	DateFrom *time.Time
+	DateTo   *time.Time
+	Limit    int
+	Offset   int
+	SortBy   string
+	SortDesc bool
 }
 
 // ExampleFilters defines filters for example queries

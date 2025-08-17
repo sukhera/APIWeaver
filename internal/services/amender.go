@@ -12,22 +12,22 @@ import (
 
 // AmendmentResult represents the result of OpenAPI amendment
 type AmendmentResult struct {
-	Content   string              `json:"content"`
-	Format    string              `json:"format"`
-	Changes   []string            `json:"changes"`
-	Conflicts []string            `json:"conflicts,omitempty"`
-	Metadata  AmendmentMetadata   `json:"metadata"`
-	Warnings  []string            `json:"warnings,omitempty"`
-	Errors    []string            `json:"errors,omitempty"`
+	Content   string            `json:"content"`
+	Format    string            `json:"format"`
+	Changes   []string          `json:"changes"`
+	Conflicts []string          `json:"conflicts,omitempty"`
+	Metadata  AmendmentMetadata `json:"metadata"`
+	Warnings  []string          `json:"warnings,omitempty"`
+	Errors    []string          `json:"errors,omitempty"`
 }
 
 // AmendmentMetadata contains metadata about the amendment process
 type AmendmentMetadata struct {
-	ProcessingTimeMs   int `json:"processing_time_ms"`
-	InputSizeBytes     int `json:"input_size_bytes"`
-	OutputSizeBytes    int `json:"output_size_bytes"`
-	ChangesApplied     int `json:"changes_applied"`
-	ConflictsResolved  int `json:"conflicts_resolved"`
+	ProcessingTimeMs  int `json:"processing_time_ms"`
+	InputSizeBytes    int `json:"input_size_bytes"`
+	OutputSizeBytes   int `json:"output_size_bytes"`
+	ChangesApplied    int `json:"changes_applied"`
+	ConflictsResolved int `json:"conflicts_resolved"`
 }
 
 // Amender service handles OpenAPI spec amendments
@@ -41,10 +41,10 @@ type Amender struct {
 func NewAmender(cfg *config.ExtendedConfig, logger *slog.Logger) *Amender {
 	// Create amender with configuration
 	amenderInstance := amender.New(amender.Config{
-		StrictMode:         cfg.StrictMode,
+		StrictMode:           cfg.StrictMode,
 		AllowBreakingChanges: !cfg.StrictMode,
-		ConflictResolution: amender.ConflictResolutionAuto,
-		ValidateOutput:     true,
+		ConflictResolution:   amender.ConflictResolutionAuto,
+		ValidateOutput:       true,
 	})
 
 	return &Amender{
@@ -57,7 +57,7 @@ func NewAmender(cfg *config.ExtendedConfig, logger *slog.Logger) *Amender {
 // Amend applies changes to an existing OpenAPI specification
 func (a *Amender) Amend(ctx context.Context, existingSpec, changes, format string, dryRun bool) (*AmendmentResult, error) {
 	startTime := time.Now()
-	
+
 	a.logger.InfoContext(ctx, "Starting OpenAPI amendment",
 		"spec_size", len(existingSpec),
 		"changes_size", len(changes),
@@ -99,7 +99,7 @@ func (a *Amender) Amend(ctx context.Context, existingSpec, changes, format strin
 	}
 
 	processingTime := time.Since(startTime)
-	
+
 	amendmentResult := &AmendmentResult{
 		Content:   content,
 		Format:    format,

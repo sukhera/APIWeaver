@@ -13,11 +13,11 @@ import (
 
 // ValidationResult represents the result of validation
 type ValidationResult struct {
-	Valid       bool                `json:"valid"`
-	Errors      []string            `json:"errors,omitempty"`
-	Warnings    []string            `json:"warnings,omitempty"`
-	Suggestions []string            `json:"suggestions,omitempty"`
-	Metadata    ValidationMetadata  `json:"metadata"`
+	Valid       bool               `json:"valid"`
+	Errors      []string           `json:"errors,omitempty"`
+	Warnings    []string           `json:"warnings,omitempty"`
+	Suggestions []string           `json:"suggestions,omitempty"`
+	Metadata    ValidationMetadata `json:"metadata"`
 }
 
 // ValidationMetadata contains metadata about the validation process
@@ -52,10 +52,10 @@ func NewValidator(cfg *config.ExtendedConfig, logger *slog.Logger) *Validator {
 
 	// Create OpenAPI validator
 	openapiValidator := validator.NewOpenAPIValidator(validator.Config{
-		StrictMode:      cfg.StrictMode,
-		ValidateExamples: true,
+		StrictMode:         cfg.StrictMode,
+		ValidateExamples:   true,
 		CheckBestPractices: true,
-		AllowExtensions: true,
+		AllowExtensions:    true,
 	})
 
 	return &Validator{
@@ -69,7 +69,7 @@ func NewValidator(cfg *config.ExtendedConfig, logger *slog.Logger) *Validator {
 // Validate validates content based on its type (markdown or openapi)
 func (v *Validator) Validate(ctx context.Context, content, inputType string) (*ValidationResult, error) {
 	startTime := time.Now()
-	
+
 	v.logger.InfoContext(ctx, "Starting validation",
 		"input_size", len(content),
 		"input_type", inputType,
@@ -116,8 +116,8 @@ func (v *Validator) validateMarkdown(ctx context.Context, content string) (*Vali
 	doc, err := v.parser.ParseWithContext(ctx, content)
 	if err != nil {
 		return &ValidationResult{
-			Valid:   false,
-			Errors:  []string{err.Error()},
+			Valid:    false,
+			Errors:   []string{err.Error()},
 			Metadata: ValidationMetadata{},
 		}, nil
 	}
@@ -168,8 +168,8 @@ func (v *Validator) validateOpenAPI(ctx context.Context, content string) (*Valid
 	validationResult, err := v.openapiValidator.Validate(ctx, content)
 	if err != nil {
 		return &ValidationResult{
-			Valid:   false,
-			Errors:  []string{err.Error()},
+			Valid:    false,
+			Errors:   []string{err.Error()},
 			Metadata: ValidationMetadata{},
 		}, nil
 	}
@@ -189,7 +189,7 @@ func (v *Validator) validateOpenAPI(ctx context.Context, content string) (*Valid
 // ValidateFile validates a file based on its extension
 func (v *Validator) ValidateFile(ctx context.Context, filename string) (*ValidationResult, error) {
 	v.logger.InfoContext(ctx, "Validating file", "filename", filename)
-	
+
 	// This would read the file and determine type based on extension
 	// Implementation would use the file utilities from common package
 	return nil, fmt.Errorf("not implemented")

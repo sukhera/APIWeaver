@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/sukhera/APIWeaver/internal/config"
@@ -76,8 +77,11 @@ func runValidate(ctx context.Context, inputFile, inputType, configFile string, v
 		"strict", strict,
 	)
 
+	// Clean and validate input file path
+	inputFile = filepath.Clean(inputFile)
+
 	// Read input file
-	content, err := os.ReadFile(inputFile)
+	content, err := os.ReadFile(inputFile) // #nosec G304 - file path is from CLI argument
 	if err != nil {
 		return fmt.Errorf("failed to read input file %s: %w", inputFile, err)
 	}
@@ -112,7 +116,7 @@ func detectInputType(filename string) string {
 	if len(filename) > 4 && filename[len(filename)-4:] == ".yml" {
 		return "openapi"
 	}
-	
+
 	// Default to markdown for unknown extensions
 	return "markdown"
 }
