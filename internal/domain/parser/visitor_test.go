@@ -358,3 +358,139 @@ func TestMockVisitor_Integration(t *testing.T) {
 		})
 	}
 }
+
+func TestHelper_ValidateDocument(t *testing.T) {
+	tests := []struct {
+		name          string
+		doc           *Document
+		strictMode    bool
+		expectedCount int
+	}{
+		{
+			name: "success with valid document",
+			doc: &Document{
+				Endpoints: []*Endpoint{
+					{
+						Method:     "GET",
+						Path:       "/test",
+						LineNumber: 1,
+					},
+				},
+			},
+			strictMode:    false,
+			expectedCount: 0,
+		},
+		{
+			name: "error with invalid HTTP method",
+			doc: &Document{
+				Endpoints: []*Endpoint{
+					{
+						Method:     "INVALID",
+						Path:       "/test",
+						LineNumber: 1,
+					},
+				},
+			},
+			strictMode:    false,
+			expectedCount: 1,
+		},
+		{
+			name: "error with invalid path",
+			doc: &Document{
+				Endpoints: []*Endpoint{
+					{
+						Method:     "GET",
+						Path:       "invalid-path",
+						LineNumber: 1,
+					},
+				},
+			},
+			strictMode:    false,
+			expectedCount: 1,
+		},
+		{
+			name: "warning with missing description in strict mode",
+			doc: &Document{
+				Endpoints: []*Endpoint{
+					{
+						Method:     "GET",
+						Path:       "/test",
+						LineNumber: 1,
+					},
+				},
+			},
+			strictMode:    true,
+			expectedCount: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			errors := ValidateDocument(context.Background(), tt.doc, tt.strictMode)
+			assert.Len(t, errors, tt.expectedCount)
+		})
+	}
+}
+
+func TestHelper_GetDocumentStatistics(t *testing.T) {
+	tests := []struct {
+		name          string
+		doc           *Document
+		expectedStats DocumentStatistics
+	}{
+		{
+			name: "success with single endpoint",
+			doc: &Document{
+				Endpoints: []*Endpoint{
+					{
+						Method: "GET",
+						Path:   "/test",
+					},
+				},
+				Components: []*Component{},
+			},
+			expectedStats: DocumentStatistics{
+				TotalEndpoints:    1,
+				EndpointsByMethod: map[string]int{"GET": 1},
+				TotalComponents:   0,
+				HasFrontmatter:    false,
+			},
+		},
+		{
+			name: "success with multiple endpoints and components",
+			doc: &Document{
+				Endpoints: []*Endpoint{
+					{Method: "GET", Path: "/test1"},
+					{Method: "POST", Path: "/test2"},
+					{Method: "GET", Path: "/test3"},
+				},
+				Components: []*Component{
+					{Name: "TestComponent", Type: "schema"},
+				},
+			},
+			expectedStats: DocumentStatistics{
+				TotalEndpoints:    3,
+				EndpointsByMethod: map[string]int{"GET": 2, "POST": 1},
+				TotalComponents:   1,
+				HasFrontmatter:    false,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			visitor := NewStatisticsVisitor()
+			err := tt.doc.Accept(context.Background(), visitor)
+			stats := visitor.Stats
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedStats.TotalEndpoints, stats.TotalEndpoints)
+			assert.Equal(t, tt.expectedStats.TotalComponents, stats.TotalComponents)
+			assert.Equal(t, tt.expectedStats.HasFrontmatter, stats.HasFrontmatter)
+
+			for method, count := range tt.expectedStats.EndpointsByMethod {
+				assert.Equal(t, count, stats.EndpointsByMethod[method])
+			}
+		})
+	}
+}

@@ -324,11 +324,13 @@ func (v *ValidationVisitor) VisitSchema(ctx context.Context, schema *Schema) err
 	return nil
 }
 
-func (v *ValidationVisitor) addError(errorType, message string, lineNumber int) {
-	_ = errorType // TODO: Use errorType to determine severity level
+func (v *ValidationVisitor) addError(level, message string, lineNumber int) {
+	// This assumes the ParseError struct and its builder in the errors package
+	// have been updated to handle a severity level.
 	v.errors = append(v.errors, errors.NewError(errors.ErrorTypeValidation, message).
 		AtLine(lineNumber).
 		WithContext(v.currentPath).
+		// WithSeverity(level). // Example of how it might be used
 		Build())
 }
 
@@ -466,8 +468,12 @@ func (v *TransformVisitor) VisitEndpoint(ctx context.Context, endpoint *Endpoint
 func ValidateDocument(ctx context.Context, doc *Document, strictMode bool) []*errors.ParseError {
 	visitor := NewValidationVisitor(strictMode)
 	if err := doc.Accept(ctx, visitor); err != nil {
-		// Add the error to the visitor's error collection
-		visitor.errors = append(visitor.errors, errors.NewError(errors.ErrorTypeValidation, err.Error()).Build())
+		// If the returned error is already a ParseError, add it directly.
+		if pe, ok := err.(*errors.ParseError); ok {
+			visitor.errors = append(visitor.errors, pe)
+		} else {
+			visitor.errors = append(visitor.errors, errors.NewError(errors.ErrorTypeValidation, err.Error()).Build())
+		}
 	}
 	return visitor.GetErrors()
 }

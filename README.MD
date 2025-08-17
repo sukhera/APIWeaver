@@ -169,7 +169,6 @@ make lint-frontend   # Lint frontend code
 - Prometheus metrics integration
 - Template library for common API patterns
 - WebSocket support for real-time updates
-- Multi-language support (Python, JavaScript SDKs)
 - Git integration for version control
 
 ## Contributing

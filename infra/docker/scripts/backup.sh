@@ -6,7 +6,12 @@ set -euo pipefail
 
 # Configuration
 BACKUP_DIR="${BACKUP_DIR:-/backups}"
-MONGODB_URI="${MONGODB_URI:-mongodb://admin:apiweaver123@mongodb:27017/apiweaver?authSource=admin}"
+MONGODB_URI="${MONGODB_URI:-}"
+if [[ -z "${MONGODB_URI}" ]]; then
+    log "ERROR: MONGODB_URI environment variable is not set."
+    log "Please set it to your MongoDB connection string (e.g., mongodb://user:pass@host:port/db)."
+    exit 1
+fi
 BACKUP_RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-30}"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_NAME="apiweaver_backup_${TIMESTAMP}"
