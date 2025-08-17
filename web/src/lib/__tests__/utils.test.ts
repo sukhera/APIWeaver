@@ -52,8 +52,8 @@ describe('cn utility function', () => {
   })
 
   it('handles complex combinations', () => {
-    const variant = 'primary'
-    const size = 'lg'
+    const variant: string = 'primary'
+    const size: string = 'lg'
     const disabled = false
     
     const result = cn(

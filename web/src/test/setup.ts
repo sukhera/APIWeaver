@@ -57,6 +57,15 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 })
 
+// Mock clipboard API
+Object.defineProperty(navigator, 'clipboard', {
+  value: {
+    writeText: vi.fn().mockResolvedValue(undefined),
+    readText: vi.fn().mockResolvedValue(''),
+  },
+  configurable: true,
+})
+
 // Mock FileReader
 global.FileReader = class FileReader {
   readAsText = vi.fn()
@@ -71,6 +80,19 @@ global.FileReader = class FileReader {
   static readonly EMPTY = 0
   static readonly LOADING = 1
   static readonly DONE = 2
+  
+  constructor() {
+    // Simulate successful file read
+    setTimeout(() => {
+      this.readyState = 2 // DONE
+      if (this.onload) {
+        this.onload({ target: this } as unknown as ProgressEvent<FileReader>)
+      }
+    }, 0)
+  }
+  
+  onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null
+  onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null
 } as unknown as typeof FileReader
 
 // Mock Monaco Editor
@@ -104,5 +126,11 @@ beforeAll(() => {
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+  }
+
+  // Ensure document.body exists
+  if (!document.body) {
+    document.body = document.createElement('body')
+    document.documentElement.appendChild(document.body)
   }
 })

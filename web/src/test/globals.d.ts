@@ -1,3 +1,5 @@
+/// <reference types="@testing-library/jest-dom" />
+
 declare global {
   const ResizeObserver: typeof ResizeObserver
   const IntersectionObserver: typeof IntersectionObserver
