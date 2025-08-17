@@ -300,3 +300,4 @@ test-data/*.backup
 data/
 apiweaver
 logs/
+scripts/
