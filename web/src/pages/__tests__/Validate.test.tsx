@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from '@/components/theme-provider'
 import Validate from '../Validate'
 import * as apiQueries from '@/hooks/useApiQueries'
+import { asMockValidateMutation, asMockRealtimeValidation } from '@/test/types'
 
 // Mock the API hooks
 vi.mock('@/hooks/useApiQueries')
@@ -33,21 +34,56 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
 describe('Validate Page - Simple Tests', () => {
   const mockValidateMutation = {
     mutateAsync: vi.fn(),
+    mutate: vi.fn(),
     isPending: false,
+    isError: false,
+    isIdle: true,
+    isSuccess: false,
+    isPaused: false,
     error: null,
-    data: null,
-    reset: vi.fn()
+    data: undefined,
+    reset: vi.fn(),
+    variables: undefined,
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
+    status: 'idle' as const,
+    submittedAt: 0
   }
 
   const mockRealtimeValidation = {
-    data: null,
+    data: undefined,
     isFetching: false,
-    error: null
+    error: null,
+    isLoading: false,
+    isPending: false,
+    isError: false,
+    isSuccess: false,
+    isPaused: false,
+    isEnabled: true,
+    isLoadingError: false,
+    isRefetchError: false,
+    status: 'pending' as const,
+    fetchStatus: 'idle' as const,
+    refetch: vi.fn(),
+    remove: vi.fn(),
+    dataUpdatedAt: 0,
+    errorUpdatedAt: 0,
+    failureCount: 0,
+    failureReason: null,
+    errorUpdateCount: 0,
+    isFetched: false,
+    isFetchedAfterMount: false,
+    isInitialLoading: false,
+    isPlaceholderData: false,
+    isPreviousData: false,
+    isRefetching: false,
+    isStale: false
   }
 
   beforeEach(() => {
-    vi.mocked(apiQueries.useValidateMutation).mockReturnValue(mockValidateMutation)
-    vi.mocked(apiQueries.useRealtimeValidation).mockReturnValue(mockRealtimeValidation)
+    vi.mocked(apiQueries.useValidateMutation).mockReturnValue(asMockValidateMutation(mockValidateMutation))
+    vi.mocked(apiQueries.useRealtimeValidation).mockReturnValue(asMockRealtimeValidation(mockRealtimeValidation))
     vi.clearAllMocks()
   })
 
@@ -132,10 +168,10 @@ describe('Validate Page - Simple Tests', () => {
   })
 
   it('shows loading state when validating', () => {
-    vi.mocked(apiQueries.useValidateMutation).mockReturnValue({
+    vi.mocked(apiQueries.useValidateMutation).mockReturnValue(asMockValidateMutation({
       ...mockValidateMutation,
       isPending: true
-    })
+    }))
 
     render(
       <TestWrapper>
@@ -160,10 +196,10 @@ describe('Validate Page - Simple Tests', () => {
       }
     }
 
-    vi.mocked(apiQueries.useValidateMutation).mockReturnValue({
+    vi.mocked(apiQueries.useValidateMutation).mockReturnValue(asMockValidateMutation({
       ...mockValidateMutation,
       data: mockValidationResult
-    })
+    }))
 
     render(
       <TestWrapper>
@@ -196,10 +232,10 @@ describe('Validate Page - Simple Tests', () => {
       }
     }
 
-    vi.mocked(apiQueries.useValidateMutation).mockReturnValue({
+    vi.mocked(apiQueries.useValidateMutation).mockReturnValue(asMockValidateMutation({
       ...mockValidateMutation,
       data: mockValidationResult
-    })
+    }))
 
     render(
       <TestWrapper>

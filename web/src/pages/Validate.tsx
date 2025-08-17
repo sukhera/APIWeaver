@@ -131,7 +131,7 @@ export default function Validate() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value: 'editor' | 'upload') => setActiveTab(value)}>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'editor' | 'upload')}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="editor">Editor</TabsTrigger>
             <TabsTrigger value="upload">Upload</TabsTrigger>
@@ -249,7 +249,7 @@ export default function Validate() {
           )}
         </div>
 
-        <Tabs value={outputTab} onValueChange={(value: 'results' | 'summary' | 'errors') => setOutputTab(value)}>
+        <Tabs value={outputTab} onValueChange={(value) => setOutputTab(value as 'results' | 'summary' | 'errors')}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="results">Results</TabsTrigger>
             <TabsTrigger value="summary">Summary</TabsTrigger>

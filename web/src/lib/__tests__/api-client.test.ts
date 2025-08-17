@@ -20,11 +20,12 @@ describe('ApiClient', () => {
         warnings: [],
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => mockResponse,
-      })
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      )
 
       const request: GenerateRequest = {
         markdown: '# Test API\n\n## GET /users',
@@ -65,11 +66,12 @@ describe('ApiClient', () => {
         },
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => mockResponse,
-      })
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      )
 
       const request: ValidateRequest = {
         spec: 'openapi: 3.1.0\ninfo:\n  title: Test API\n  version: 1.0.0',
@@ -105,11 +107,12 @@ describe('ApiClient', () => {
         warnings: [],
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => mockResponse,
-      })
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      )
 
       const request: ValidateRequest = {
         spec: 'openapi: 3.1.0\ninfo:\n  version: 1.0.0',
@@ -132,11 +135,12 @@ describe('ApiClient', () => {
         timestamp: '2023-01-01T00:00:00Z',
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => mockResponse,
-      })
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      )
 
       const result = await apiClient.health()
 
@@ -153,15 +157,13 @@ describe('ApiClient', () => {
 
   describe('error handling', () => {
     it('handles non-JSON error responses', async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
-        headers: new Headers({ 'content-type': 'text/plain' }),
-        json: async () => {
-          throw new Error('Not JSON')
-        },
-      })
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response('Internal Server Error', {
+          status: 500,
+          statusText: 'Internal Server Error',
+          headers: { 'content-type': 'text/plain' }
+        })
+      )
 
       const request: GenerateRequest = {
         markdown: '# Test API',
@@ -172,14 +174,12 @@ describe('ApiClient', () => {
     })
 
     it('handles empty responses', async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        headers: new Headers({ 'content-type': 'text/plain' }),
-        text: async () => 'Success',
-        json: async () => {
-          throw new Error('Not JSON')
-        },
-      })
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response('Success', {
+          status: 200,
+          headers: { 'content-type': 'text/plain' }
+        })
+      )
 
       const result = await apiClient.health()
       expect(result).toBe('Success')

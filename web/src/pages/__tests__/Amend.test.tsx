@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from '@/components/theme-provider'
 import Amend from '../Amend'
 import * as apiQueries from '@/hooks/useApiQueries'
+import { asMockAmendMutation, asMockDiffMutation } from '@/test/types'
 
 // Mock the API hooks
 vi.mock('@/hooks/useApiQueries')
@@ -33,23 +34,45 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
 describe('Amend Page - Simple Tests', () => {
   const mockAmendMutation = {
     mutateAsync: vi.fn(),
+    mutate: vi.fn(),
     isPending: false,
+    isError: false,
+    isIdle: true,
+    isSuccess: false,
+    isPaused: false,
     error: null,
-    data: null,
-    reset: vi.fn()
+    data: undefined,
+    reset: vi.fn(),
+    variables: undefined,
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
+    status: 'idle' as const,
+    submittedAt: 0
   }
 
   const mockDiffMutation = {
     mutateAsync: vi.fn(),
+    mutate: vi.fn(),
     isPending: false,
+    isError: false,
+    isIdle: true,
+    isSuccess: false,
+    isPaused: false,
     error: null,
-    data: null,
-    reset: vi.fn()
+    data: undefined,
+    reset: vi.fn(),
+    variables: undefined,
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
+    status: 'idle' as const,
+    submittedAt: 0
   }
 
   beforeEach(() => {
-    vi.mocked(apiQueries.useAmendMutation).mockReturnValue(mockAmendMutation)
-    vi.mocked(apiQueries.useDiffMutation).mockReturnValue(mockDiffMutation)
+    vi.mocked(apiQueries.useAmendMutation).mockReturnValue(asMockAmendMutation(mockAmendMutation))
+    vi.mocked(apiQueries.useDiffMutation).mockReturnValue(asMockDiffMutation(mockDiffMutation))
     vi.clearAllMocks()
   })
 
@@ -124,10 +147,10 @@ describe('Amend Page - Simple Tests', () => {
   })
 
   it('shows loading state when amending', () => {
-    vi.mocked(apiQueries.useAmendMutation).mockReturnValue({
+    vi.mocked(apiQueries.useAmendMutation).mockReturnValue(asMockAmendMutation({
       ...mockAmendMutation,
       isPending: true
-    })
+    }))
 
     render(
       <TestWrapper>
@@ -139,10 +162,10 @@ describe('Amend Page - Simple Tests', () => {
   })
 
   it('shows loading state when generating diff', () => {
-    vi.mocked(apiQueries.useDiffMutation).mockReturnValue({
+    vi.mocked(apiQueries.useDiffMutation).mockReturnValue(asMockDiffMutation({
       ...mockDiffMutation,
       isPending: true
-    })
+    }))
 
     render(
       <TestWrapper>
@@ -160,10 +183,10 @@ describe('Amend Page - Simple Tests', () => {
       warnings: []
     }
 
-    vi.mocked(apiQueries.useAmendMutation).mockReturnValue({
+    vi.mocked(apiQueries.useAmendMutation).mockReturnValue(asMockAmendMutation({
       ...mockAmendMutation,
       data: mockAmendResult
-    })
+    }))
 
     render(
       <TestWrapper>
@@ -194,10 +217,10 @@ describe('Amend Page - Simple Tests', () => {
       }
     }
 
-    vi.mocked(apiQueries.useDiffMutation).mockReturnValue({
+    vi.mocked(apiQueries.useDiffMutation).mockReturnValue(asMockDiffMutation({
       ...mockDiffMutation,
       data: mockDiffResult
-    })
+    }))
 
     render(
       <TestWrapper>

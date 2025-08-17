@@ -205,7 +205,7 @@ export default function Amend() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value: 'original' | 'changes' | 'upload') => setActiveTab(value)}>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'original' | 'changes' | 'upload')}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="original">Original</TabsTrigger>
             <TabsTrigger value="changes">Changes</TabsTrigger>
@@ -353,7 +353,7 @@ export default function Amend() {
           )}
         </div>
 
-        <Tabs value={outputTab} onValueChange={(value: 'amended' | 'diff' | 'preview') => setOutputTab(value)}>
+        <Tabs value={outputTab} onValueChange={(value) => setOutputTab(value as 'amended' | 'diff' | 'preview')}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="amended">Amended</TabsTrigger>
             <TabsTrigger value="diff">Diff</TabsTrigger>

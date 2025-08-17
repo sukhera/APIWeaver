@@ -28,6 +28,7 @@ export interface AmendRequest {
   originalSpec: string
   changes: string
   format?: 'yaml' | 'json'
+  dryRun?: boolean
 }
 
 export interface AmendResponse {

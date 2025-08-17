@@ -92,7 +92,7 @@ export const mockApiResponses = {
 }
 
 // Helper to wait for async operations
-export const waitFor = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+export const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 // Re-export testing utilities
 // eslint-disable-next-line react-refresh/only-export-components
