@@ -36,14 +36,13 @@ help: ## Show this help message
 
 # Build targets
 .PHONY: build
-build: ## Build the application
+build: create-dirs ## Build the application
 	@echo "Building APIWeaver..."
 	$(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/apiweaver
 
 .PHONY: build-all
-build-all: ## Build for all platforms
+build-all: create-dirs ## Build for all platforms
 	@echo "Building for all platforms..."
-	mkdir -p $(DIST_DIR)
 	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/apiweaver
 	GOOS=darwin GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/apiweaver
 	GOOS=darwin GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/apiweaver
@@ -169,6 +168,19 @@ run: ## Run the application (requires -input flag)
 	$(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/apiweaver
 	./$(BUILD_DIR)/$(BINARY_NAME) $(ARGS)
 
+.PHONY: serve
+serve: ## Start APIWeaver server in development mode with Docker
+	@echo "Starting APIWeaver server with hot reload..."
+	cd infra && make -f Makefile.docker docker-dev
+	@echo ""
+	@echo "APIWeaver server running with hot reload"
+	@echo "  • API: http://localhost:8080"
+	@echo "  • Health check: http://localhost:8080/api/v1/health"
+	@echo "  • MongoDB Express: http://localhost:8081"
+	@echo ""
+	@echo "Press Ctrl+C to stop..."
+	@trap 'cd infra && make -f Makefile.docker docker-stop' INT; cd infra && make -f Makefile.docker docker-dev-logs
+
 # Documentation targets
 .PHONY: docs
 docs: ## Generate documentation
@@ -196,6 +208,27 @@ docker-build: ## Build Docker image
 docker-run: ## Run Docker container
 	@echo "Running Docker container..."
 	docker run --rm -it apiweaver:latest
+
+.PHONY: docker-dev
+docker-dev: ## Start development environment with Docker Compose
+	@echo "Starting development environment..."
+	cd infra && make -f Makefile.docker docker-dev
+
+.PHONY: docker-dev-logs
+docker-dev-logs: ## Show development logs
+	cd infra && make -f Makefile.docker docker-dev-logs
+
+.PHONY: docker-test
+docker-test: ## Test backend in Docker environment
+	cd infra && make -f Makefile.docker docker-test
+
+.PHONY: docker-stop
+docker-stop: ## Stop Docker development environment
+	cd infra && make -f Makefile.docker docker-stop
+
+.PHONY: docker-clean
+docker-clean: ## Clean Docker resources
+	cd infra && make -f Makefile.docker docker-clean
 
 # Dependencies
 .PHONY: deps
@@ -258,10 +291,9 @@ install-tools: ## Install development tools
 	@echo "Development tools installed!"
 
 # Create directories
-$(BUILD_DIR):
+.PHONY: create-dirs
+create-dirs:
 	mkdir -p $(BUILD_DIR)
-
-$(DIST_DIR):
 	mkdir -p $(DIST_DIR)
 
 # Frontend targets

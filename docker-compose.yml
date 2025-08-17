@@ -1,0 +1,107 @@
+# Base Docker Compose configuration for APIWeaver
+# This file provides the base services that are extended by override files
+
+version: '3.8'
+
+services:
+  # MongoDB Database Service
+  mongodb:
+    image: mongo:7.0-jammy
+    container_name: apiweaver-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-apiweaver123}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-apiweaver}
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./logs/mongodb:/var/log/mongodb
+    networks:
+      - apiweaver-network
+    healthcheck:
+      test: 
+        - CMD
+        - sh
+        - -c
+        - |
+          echo 'db.adminCommand("ping")' | mongosh --host localhost:27017 -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --quiet
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    profiles:
+      - ""  # Always included
+
+  # MongoDB Express (Development only - overridden in docker-compose.override.yml)
+  mongo-express:
+    image: mongo-express:1.0.2-20
+    container_name: apiweaver-mongo-express
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_ROOT_USERNAME:-admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_ROOT_PASSWORD:-apiweaver123}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGODB_ROOT_USERNAME:-admin}:${MONGODB_ROOT_PASSWORD:-apiweaver123}@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-admin123}
+    networks:
+      - apiweaver-network
+    profiles:
+      - debug  # Only started when debug profile is active
+
+networks:
+  apiweaver-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  # MongoDB data persistence
+  mongodb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MONGODB_DATA_PATH:-./data/mongodb}
+    labels:
+      - "apiweaver.volume.type=data"
+      - "apiweaver.service=mongodb"
+
+  # MongoDB configuration files
+  mongodb_config:
+    driver: local
+    labels:
+      - "apiweaver.volume.type=config"
+      - "apiweaver.service=mongodb"
+
+  # APIWeaver application data
+  apiweaver_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${APIWEAVER_DATA_PATH:-./data/apiweaver}
+    labels:
+      - "apiweaver.volume.type=data"
+      - "apiweaver.service=apiweaver"
+
+  # APIWeaver application logs
+  apiweaver_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${APIWEAVER_LOGS_PATH:-./logs}
+    labels:
+      - "apiweaver.volume.type=logs"
+      - "apiweaver.service=apiweaver"
+
+  # Cache volumes for better performance
+  go_pkg_cache:
+    driver: local
+  node_modules:
+    driver: local

@@ -6,7 +6,12 @@ set -euo pipefail
 
 # Configuration
 BACKUP_FILE="${1:-}"
-MONGODB_URI="${MONGODB_URI:-mongodb://admin:apiweaver123@mongodb:27017/apiweaver?authSource=admin}"
+MONGODB_URI="${MONGODB_URI:-}"
+if [[ -z "${MONGODB_URI}" ]]; then
+    log "ERROR: MONGODB_URI environment variable is not set."
+    log "Please set it to your MongoDB connection string (e.g., mongodb://user:pass@host:port/db)."
+    exit 1
+fi
 TEMP_DIR="/tmp/restore_$$"
 
 # Logging
@@ -49,7 +54,7 @@ else
 fi
 
 # Find the backup directory
-BACKUP_DIR=$(find "${TEMP_DIR}" -maxdepth 1 -type d -name "apiweaver_backup_*" | head -1)
+BACKUP_DIR=$(find "${TEMP_DIR}" -maxdepth 1 -type d -name "apiweaver_backup_*" -print -quit)
 if [[ -z "${BACKUP_DIR}" ]]; then
     log "ERROR: No backup directory found in archive"
     exit 1
@@ -71,7 +76,7 @@ fi
 
 # Drop existing database
 log "Dropping existing database..."
-if mongo --eval "db.dropDatabase()" "${MONGODB_URI}"; then
+if mongosh --eval "db.dropDatabase()" "${MONGODB_URI}"; then
     log "Existing database dropped"
 else
     log "WARNING: Failed to drop existing database (it may not exist)"
@@ -88,7 +93,7 @@ fi
 
 # Verify restoration
 log "Verifying restoration..."
-COLLECTIONS=$(mongo --quiet --eval "db.getCollectionNames().length" "${MONGODB_URI}")
+COLLECTIONS=$(mongosh --quiet --eval "db.getCollectionNames().length" "${MONGODB_URI}")
 if [[ "${COLLECTIONS}" -gt 0 ]]; then
     log "Verification successful: ${COLLECTIONS} collections restored"
 else
@@ -97,7 +102,7 @@ fi
 
 # Show restoration summary
 log "=== Restoration Summary ==="
-mongo --quiet --eval "
+mongosh --quiet --eval "
     print('Database: ' + db.getName());
     print('Collections: ' + db.getCollectionNames().length);
     db.getCollectionNames().forEach(function(name) {
