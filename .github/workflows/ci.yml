@@ -182,7 +182,7 @@ jobs:
         npm run test:coverage
 
     - name: Upload frontend test coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         file: ./web/coverage/coverage-final.json
         flags: frontend
