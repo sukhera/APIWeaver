@@ -312,7 +312,7 @@ jobs:
         npx playwright install --with-deps
 
     - name: Download frontend build
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         name: frontend-build
         path: web/dist/
@@ -368,14 +368,14 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download Go coverage
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       continue-on-error: true  # Coverage artifacts may not exist if tests failed
       with:
         name: go-coverage
         path: ./go-coverage/
 
     - name: Download frontend coverage
-      uses: actions/download-artifact@v4  
+      uses: actions/download-artifact@v5  
       continue-on-error: true  # Coverage artifacts may not exist if tests failed
       with:
         name: frontend-coverage
